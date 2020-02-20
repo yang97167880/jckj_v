@@ -1,5 +1,10 @@
 <template>
   <div class="bk">
+    <el-breadcrumb separator-class="el-icon-arrow-right" class="bread">
+      <el-breadcrumb-item :to="{ path: '/top' }">
+        <i class="el-icon-s-home"></i>首页</el-breadcrumb-item
+      >
+    </el-breadcrumb>
     <img src="../../assets/img/f1.jpg" width="100%" height="100%" alt="" />
     <span style="position: absolute; top: 0; left: 40%;"
       ><font size="7" class="threed">欢迎使用基坑监测系统</font></span
@@ -20,9 +25,12 @@
   position: relative;
   width: 100%;
   height: 100%;
-  background-color: #e9eef3;
   color: #333;
   text-align: center;
   line-height: 160px;
+}
+.bread {
+  background-color: #e9eef3;
+  padding: 10px;
 }
 </style>

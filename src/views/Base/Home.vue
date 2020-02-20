@@ -48,14 +48,12 @@
         @open="handleOpen"
         @close="handleClose"
         :collapse="isCollapse"
-        background-color="#545c64"
-        text-color="#fff"
-        active-text-color="#ffd04b"
+        background-color="#e9eef3"
         style="height:100%"
       >
         <el-submenu index="1">
           <template slot="title">
-            <i class="el-icon-s-home"></i>
+            <i class="el-icon-s-unfold"></i>
             <span slot="title">基础管理</span>
           </template>
           <el-menu-item-group>
@@ -109,11 +107,12 @@
         <el-header>
           <el-tabs
             v-model="editableTabsValue"
-            type="card"
+            type="border-card"
             @tab-remove="removeTab"
-            style=" background-color:white"
+            @tab-click="tabSelect"
+            style=" background-color:#e9eef3"
           >
-            <el-tab-pane label="首页"> </el-tab-pane>
+            <el-tab-pane label="首页" name="/top"> </el-tab-pane>
             <el-tab-pane
               v-for="item in editableTabs"
               :key="item.name"
@@ -140,16 +139,12 @@ export default {
       activeIndex2: '1-1',
       isCollapse: false,
       collapseWidth: '201px',
-      editableTabsValue: '0',
+      editableTabsValue: this.$route.path,
       editableTabs: [{
-        title: 'Tab 1',
-        name: '1',
-        content: 'Tab 1 content'
-      }, {
-        title: 'Tab 2',
-        name: '2',
-        content: 'Tab 2 content'
+        title: '基坑沉降简介',
+        name: '/index',
       }],
+      tabName: this.$route.path,
       tabIndex: 2
     };
   },
@@ -159,6 +154,14 @@ export default {
   methods: {
     goCollapse () {
       this.isCollapse = !this.isCollapse;
+    },
+    tabSelect (targetName) {
+      let pathname = targetName.name;
+      if (this.tabName != pathname) {
+        this.tabName = pathname;
+        this.$router.push(pathname);
+      }
+
     },
     handleSelect (key, keyPath) {
       console.log(key, keyPath);
@@ -219,11 +222,11 @@ export default {
 }
 
 .el-main {
-  background-color: #e9eef3;
   color: #333;
   text-align: center;
   line-height: 160px;
   padding: 0px;
+  padding-top: 2px;
   width: 100%;
 }
 

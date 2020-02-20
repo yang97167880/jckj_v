@@ -23,7 +23,11 @@ const routes = [
       },
       {
         path: '/index',
-        component: resolve => require(['../views/index/index.vue'], resolve)
+        component: resolve => require(['../views/Index/index.vue'], resolve)
+      },
+      {
+        path: '/TotalView',
+        component: resolve => require(['../views/Data/TotalView.vue'], resolve)
       },
       {
         path: '/',
