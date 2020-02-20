@@ -4,8 +4,8 @@
       <el-breadcrumb-item :to="{ path: '/top' }">
         <i class="el-icon-s-home"></i>首页</el-breadcrumb-item
       >
-      <el-breadcrumb-item>管理员管理</el-breadcrumb-item>
-      <el-breadcrumb-item>管理员列表</el-breadcrumb-item>
+      <el-breadcrumb-item>数据监测</el-breadcrumb-item>
+      <el-breadcrumb-item>监测配置</el-breadcrumb-item>
     </el-breadcrumb>
     <h1>{{ msg }}</h1>
   </div>
@@ -14,7 +14,7 @@
 export default {
   data () {
     return {
-      msg: '管理员列表'
+      msg: '监测配置'
     }
   },
   methods: {

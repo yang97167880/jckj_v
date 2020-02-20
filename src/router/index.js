@@ -26,8 +26,32 @@ const routes = [
         component: resolve => require(['../views/Index/index.vue'], resolve)
       },
       {
+        path: '/SysLog',
+        component: resolve => require(['../views/System/SysLog.vue'], resolve)
+      },
+      {
+        path: '/DataView',
+        component: resolve => require(['../views/Data/DataView.vue'], resolve)
+      },
+      {
         path: '/TotalView',
         component: resolve => require(['../views/Data/TotalView.vue'], resolve)
+      },
+      {
+        path: '/HistoryData',
+        component: resolve => require(['../views/Data/HistoryData.vue'], resolve)
+      },
+      {
+        path: '/RealData',
+        component: resolve => require(['../views/Data/RealData.vue'], resolve)
+      },
+      {
+        path: '/AdminList',
+        component: resolve => require(['../views/Admin/AdminList.vue'], resolve)
+      },
+      {
+        path: '/UserAdmin',
+        component: resolve => require(['../views/Admin/UserAdmin.vue'], resolve)
       },
       {
         path: '/',

@@ -1,14 +1,16 @@
 <template>
-  <div class="bk">
+  <div>
     <el-breadcrumb separator-class="el-icon-arrow-right" class="bread">
       <el-breadcrumb-item :to="{ path: '/top' }">
         <i class="el-icon-s-home"></i>首页</el-breadcrumb-item
       >
     </el-breadcrumb>
-    <img src="../../assets/img/f1.jpg" width="100%" height="100%" alt="" />
-    <span style="position: absolute; top: 0; left: 40%;"
-      ><font size="7" class="threed">欢迎使用基坑监测系统</font></span
-    >
+    <div class="bk">
+      <img src="../../assets/img/f1.jpg" alt="" />
+      <span style="position: absolute; top: 0; left: 40%;"
+        ><font size="7" class="threed">欢迎使用基坑监测系统</font></span
+      >
+    </div>
   </div>
 </template>
 <style scoped>

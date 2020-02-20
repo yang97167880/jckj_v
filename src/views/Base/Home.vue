@@ -44,6 +44,8 @@
       <el-menu
         :default-active="activeIndex2"
         class="el-menu-vertical-demo"
+        router
+        @select="select"
         unique-opened
         @open="handleOpen"
         @close="handleClose"
@@ -57,7 +59,7 @@
             <span slot="title">基础管理</span>
           </template>
           <el-menu-item-group>
-            <el-menu-item index="1-1">基坑沉降简介</el-menu-item>
+            <el-menu-item index="/index">基坑沉降简介</el-menu-item>
           </el-menu-item-group>
         </el-submenu>
         <el-submenu index="2">
@@ -66,16 +68,16 @@
             <span slot="title">数据监测</span>
           </template>
           <el-menu-item-group>
-            <el-menu-item index="2-1">总视图</el-menu-item>
+            <el-menu-item index="/TotalView">总视图</el-menu-item>
           </el-menu-item-group>
           <el-menu-item-group>
-            <el-menu-item index="2-2">监测配置</el-menu-item>
+            <el-menu-item index="/DataView">监测配置</el-menu-item>
           </el-menu-item-group>
           <el-menu-item-group>
-            <el-menu-item index="2-3">实时数据</el-menu-item>
+            <el-menu-item index="/RealData">实时数据</el-menu-item>
           </el-menu-item-group>
           <el-menu-item-group>
-            <el-menu-item index="2-4">历史数据</el-menu-item>
+            <el-menu-item index="/HistoryData">历史数据</el-menu-item>
           </el-menu-item-group>
         </el-submenu>
         <el-submenu index="3">
@@ -84,10 +86,10 @@
             <span slot="title">管理员管理</span>
           </template>
           <el-menu-item-group>
-            <el-menu-item index="3-1">角色管理</el-menu-item>
+            <el-menu-item index="/UserAdmin">角色管理</el-menu-item>
           </el-menu-item-group>
           <el-menu-item-group>
-            <el-menu-item index="3-2">管理员列表</el-menu-item>
+            <el-menu-item index="/AdminList">管理员列表</el-menu-item>
           </el-menu-item-group>
         </el-submenu>
         <el-submenu index="4">
@@ -96,7 +98,7 @@
             <span slot="title">系统管理</span>
           </template>
           <el-menu-item-group>
-            <el-menu-item index="4-1">系统日志</el-menu-item>
+            <el-menu-item index="/SysLog">系统日志</el-menu-item>
           </el-menu-item-group>
         </el-submenu>
       </el-menu>
@@ -124,7 +126,13 @@
           </el-tabs>
         </el-header>
         <el-main style="padding-top:6px">
-          <router-view />
+          <transition name="move" mode="out-in">
+            <template>
+              <keep-alive>
+                <router-view />
+              </keep-alive>
+            </template>
+          </transition>
         </el-main>
       </el-main>
       <!-- end -->
@@ -136,7 +144,7 @@ export default {
   data () {
     return {
       activeIndex: '2-1',
-      activeIndex2: '1-1',
+      activeIndex2: this.$route.path,
       isCollapse: false,
       collapseWidth: '201px',
       editableTabsValue: this.$route.path,
@@ -144,6 +152,14 @@ export default {
         title: '基坑沉降简介',
         name: '/index',
       }],
+      tabsMap: {        '/index': '基坑沉降简介',
+        '/TotalView': '总试图',
+        '/DataView': '监测数据',
+        '/RealData': '实时数据',
+        '/HistoryData': '历史数据',
+        '/UserAdmin': '角色管理',
+        '/AdminList': '管理员列表',
+        '/SysLog': '系统日志'      },
       tabName: this.$route.path,
       tabIndex: 2
     };
@@ -157,9 +173,23 @@ export default {
     },
     tabSelect (targetName) {
       let pathname = targetName.name;
-      if (this.tabName != pathname) {
+      if (this.$route.path != pathname) {
         this.tabName = pathname;
         this.$router.push(pathname);
+        this.activeIndex2 = pathname;
+      }
+
+    },
+    select (index) {
+      let exit = false;
+      for (let i in this.editableTabs) {
+        if (index == this.editableTabs[i].name) {
+          this.editableTabsValue = index;
+          exit = true;
+        }
+      }
+      if (!exit) {
+        this.addTab(index);
       }
 
     },
@@ -173,11 +203,11 @@ export default {
       console.log(key, keyPath);
     },
     addTab (targetName) {
-      let newTabName = ++this.tabIndex + '';
+      let newTabName = targetName;
+      let newTitle = this.tabsMap[targetName];
       this.editableTabs.push({
-        title: 'New Tab',
+        title: newTitle,
         name: newTabName,
-        content: 'New Tab content'
       });
       this.editableTabsValue = newTabName;
     },
@@ -227,7 +257,6 @@ export default {
   line-height: 160px;
   padding: 0px;
   padding-top: 2px;
-  width: 100%;
 }
 
 body > .el-container {
