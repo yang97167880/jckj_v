@@ -19,7 +19,7 @@
           margin: auto"
           @selection-change="handleSelectionChange"
         >
-          <el-table-column :render-header="renderHeader">
+          <el-table-column :render-header="renderHeader" >
           <el-table-column  label="管理员列表">
             <el-table-column type="selection" width="55"></el-table-column>
             <el-table-column prop="ID" label="ID"></el-table-column>
@@ -32,7 +32,7 @@
                    size="mini"
                    type="success" round
                  @click="judegment(scope.$index, scope.row)"
-                >启用</el-button>
+                >已启用</el-button>
               </template>
             </el-table-column>
             <el-table-column prop="operation" label="操作">
@@ -81,26 +81,89 @@ export default {
           charactor: "超级管理员",
           time: "2020.2.21",
          
-        },
+        }, {
+          ID: "1",
+          name: "admin",
+          charactor: "超级管理员",
+          time: "2020.2.21",
+         
+        }, {
+          ID: "1",
+          name: "admin",
+          charactor: "超级管理员",
+          time: "2020.2.21",
+         
+        }
       
       ],
       renderHeader() {
         return (
-          <div>
-            <el-button type="primary" icon="el-icon-circle-plus">添加管理员</el-button>
+          <div >
+            <el-button type="primary" icon="el-icon-circle-plus" >添加管理员</el-button>
           </div>
         );
       }
     };
   },
   methods: {
+     handleAdd(index, row) {
+      //  this.$alert('这是一段内容', '标题名称', {
+      //     confirmButtonText: '确定',
+      //     callback: action => {
+      //       this.$message({
+      //         type: 'info',
+      //         message: `action: ${ action }`
+      //       });
+      //     }
+      //   });
+     },
     handleStop(index, row) {
+        this.$confirm("确定要停用吗?", "信息", {
+        confirmButtonText: "确定",
+        cancelButtonText: "取消",
+        type: "info"
+      })
+        .then(() => {
+          
+          this.$message({
+            type: "success",
+            message: "停用成功!"
+          });
+        })
+        .catch(() => {
+          this.$message({
+            type: "info",
+            message: "取消停用"
+          });
+        });
+
       console.log(index, row);
     },
     handleEdit(index, row) {
       console.log(index, row);
     },
     handleDelete(index, row) {
+      // 设置类似于console类型的功能
+      this.$confirm("删除该条信息, 是否继续?", "提示", {
+        confirmButtonText: "确定",
+        cancelButtonText: "取消",
+        type: "warning"
+      })
+        .then(() => {
+          // 移除对应索引位置的数据，可以对row进行设置向后台请求删除数据
+          this.tableData.splice(index, 1);
+          this.$message({
+            type: "success",
+            message: "删除成功!"
+          });
+        })
+        .catch(() => {
+          this.$message({
+            type: "info",
+            message: "已取消删除"
+          });
+        });
+
       console.log(index, row);
     },
     judegment(index, row){
