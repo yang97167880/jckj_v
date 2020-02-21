@@ -8,11 +8,7 @@
       <el-breadcrumb-item>系统日志</el-breadcrumb-item>
     </el-breadcrumb>
     <div class="container" style="border:0px">
-      <el-row
-        type="flex"
-        justify="center"
-        style="margin-top:-35px;min-width:950px"
-      >
+      <el-row type="flex" justify="center" style="min-width:950px">
         <el-col :span="12">
           <span>选择日期范围：</span>
           <el-date-picker
@@ -39,14 +35,17 @@
         </el-col>
         <el-col :span="5"> </el-col>
       </el-row>
+      <br />
       <el-input
         type="textarea"
         show-word-limit
-        rows="10"
+        rows="12"
         placeholder="27日，温湿度正常，需要注意下午下雨"
         v-model="textarea"
       >
       </el-input>
+      <br />
+      <br />
       <el-button type="success" round>提交</el-button>
     </div>
   </div>
