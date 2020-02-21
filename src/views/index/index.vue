@@ -139,6 +139,6 @@ export default {
 }
 .bread {
   background-color: #e9eef3;
-  padding: 10px;
+  padding: 5px;
 }
 </style>

@@ -38,7 +38,7 @@ export default {
 <style scoped>
 .bread {
   background-color: #e9eef3;
-  padding: 10px;
+  padding: 5px;
 }
 .ny{width: 800px;margin: 50px auto ;border: solid 1px gray;}
 .wz{width: 100%;float: left}
