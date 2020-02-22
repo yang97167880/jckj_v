@@ -98,27 +98,27 @@ export default {
           time: "2020.2.21",
 
         }
-      ],
-      renderHeader () {
-        return (
-          <div >
-            <el-button type="primary" icon="el-icon-circle-plus" >添加管理员</el-button>
-          </div>
-        );
-      }
+      ]
     };
   },
   methods: {
+    renderHeader () {
+      return (
+        <div >
+          <el-button type="primary" icon="el-icon-circle-plus" on-click={() => this.handleAdd()} >添加管理员</el-button>
+        </div>
+      );
+    },
     handleAdd (index, row) {
-      //  this.$alert('这是一段内容', '标题名称', {
-      //     confirmButtonText: '确定',
-      //     callback: action => {
-      //       this.$message({
-      //         type: 'info',
-      //         message: `action: ${ action }`
-      //       });
-      //     }
-      //   });
+      this.$alert('这是一段内容', '标题名称', {
+        confirmButtonText: '确定',
+        callback: action => {
+          this.$message({
+            type: 'info',
+            message: `action: ${action}`
+          });
+        }
+      });
     },
     handleStop (index, row) {
       this.$confirm("确定要停用吗?", "信息", {
