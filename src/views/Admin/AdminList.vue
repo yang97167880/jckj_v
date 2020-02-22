@@ -30,104 +30,132 @@
                   type="success"
                   round
                   @click="judegment(scope.$index, scope.row)"
-                  >已启用</el-button
-                >
+                >已启用</el-button>
               </template>
             </el-table-column>
-            <el-table-column prop="operation" label="操作">
+            <el-table-column prop="operation" label="操作" width="250">
               <template slot-scope="scope">
                 <el-button
                   size="mini"
                   type="info"
                   plain
                   @click="handleStop(scope.$index, scope.row)"
-                  >停用</el-button
-                >
-                <el-button
-                  plain
-                  size="mini"
-                  @click="handleEdit(scope.$index, scope.row)"
-                  >编辑</el-button
-                >
+                >停用</el-button>
+                <el-button plain size="mini" @click="handleEdit(scope.$index, scope.row)">编辑</el-button>
                 <el-button
                   size="mini"
                   type="danger"
                   plain
                   @click="handleDelete(scope.$index, scope.row)"
-                  >删除</el-button
-                >
+                >删除</el-button>
               </template>
             </el-table-column>
           </el-table-column>
         </el-table-column>
       </el-table>
     </div>
+
+    <!--对话框 Form
+    用户名form.name
+    密码form.psd
+    重复密码form.re_psd
+    选择权限form.charactor_right
+    超级管理员 SuperAdministrator
+    管理员 Administrator
+     -->
+    <el-dialog title="注册信息填写" :visible.sync="dialogFormVisible">
+      <el-form :model="form">
+        <el-form-item label="用户名" :label-width="formLabelWidth">
+          <el-input v-model="form.name" autocomplete="off" placeholder="请填写用户名"></el-input>
+        </el-form-item>
+        <el-form-item label="密码" :label-width="formLabelWidth">
+          <el-input v-model="form.psd" autocomplete="off" placeholder="请填写密码"></el-input>
+        </el-form-item>
+        <el-form-item label="重复密码" :label-width="formLabelWidth">
+          <el-input v-model="form.re_psd" autocomplete="off" placeholder="重复密码"></el-input>
+        </el-form-item>
+        <el-form-item label="选择权限" :label-width="formLabelWidth">
+          <el-select v-model="form.charactor_right" placeholder="请选择角色权限">
+            <el-option label="超级管理员" value="SuperAdministrator"></el-option>
+            <el-option label="管理员" value="Administrator"></el-option>
+          </el-select>
+        </el-form-item>
+      </el-form>
+      <div slot="footer" class="dialog-footer">
+        <el-button @click="dialogFormVisible = false">取 消</el-button>
+        <el-button type="primary" @click="dialogFormVisible = false">确 定</el-button>
+      </div>
+    </el-dialog>
   </div>
 </template>
 <script>
 export default {
-  data () {
+  data() {
     return {
       msg: "管理员列表",
       tableData: [
         {
-          ID: '1',
+          ID: "1",
           name: "admin",
           charactor: "超级管理员",
-          time: "2020.2.21",
-
+          time: "2020.2.21"
         },
         {
-          ID: '1',
+          ID: "1",
           name: "admin",
           charactor: "超级管理员",
-          time: "2020.2.21",
-
+          time: "2020.2.21"
         },
         {
-          ID: '1',
+          ID: "1",
           name: "admin",
           charactor: "超级管理员",
-          time: "2020.2.21",
-
+          time: "2020.2.21"
         },
         {
-          ID: '1',
+          ID: "1",
           name: "admin",
           charactor: "超级管理员",
-          time: "2020.2.21",
-
+          time: "2020.2.21"
         }
-      ]
+      ],
+      dialogTableVisible: false,
+      dialogFormVisible: false,
+      form: {
+        name: "",
+        region: "",
+        date1: "",
+        date2: "",
+        delivery: false,
+        type: [],
+        resource: "",
+        desc: ""
+      },
+      formLabelWidth: "120px"
     };
   },
   methods: {
-    renderHeader () {
+    renderHeader() {
       return (
-        <div >
-          <el-button type="primary" icon="el-icon-circle-plus" on-click={() => this.handleAdd()} >添加管理员</el-button>
+        <div>
+          <el-button
+            type="primary"
+            icon="el-icon-circle-plus"
+            on-click={() => (this.dialogFormVisible = true)}
+          >
+            添加管理员
+          </el-button>
         </div>
       );
     },
-    handleAdd (index, row) {
-      this.$alert('这是一段内容', '标题名称', {
-        confirmButtonText: '确定',
-        callback: action => {
-          this.$message({
-            type: 'info',
-            message: `action: ${action}`
-          });
-        }
-      });
-    },
-    handleStop (index, row) {
+
+    handleStop(index, row) {
       this.$confirm("确定要停用吗?", "信息", {
         confirmButtonText: "确定",
         cancelButtonText: "取消",
         type: "info"
       })
         .then(() => {
-
           this.$message({
             type: "success",
             message: "停用成功!"
@@ -142,10 +170,10 @@ export default {
 
       console.log(index, row);
     },
-    handleEdit (index, row) {
+    handleEdit(index, row) {
       console.log(index, row);
     },
-    handleDelete (index, row) {
+    handleDelete(index, row) {
       // 设置类似于console类型的功能
       this.$confirm("删除该条信息, 是否继续?", "提示", {
         confirmButtonText: "确定",
@@ -169,10 +197,10 @@ export default {
 
       console.log(index, row);
     },
-    judegment (index, row) {
+    judegment(index, row) {
       console.log(index, row);
     },
-    handleSelectionChange (val) {
+    handleSelectionChange(val) {
       this.multipleSelection = val;
     }
   }
