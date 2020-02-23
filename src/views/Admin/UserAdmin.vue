@@ -2,8 +2,8 @@
   <div>
     <el-breadcrumb separator-class="el-icon-arrow-right" class="bread">
       <el-breadcrumb-item :to="{ path: '/top' }">
-        <i class="el-icon-s-home"></i>首页</el-breadcrumb-item
-      >
+        <i class="el-icon-s-home"></i>首页
+      </el-breadcrumb-item>
       <el-breadcrumb-item>管理员管理</el-breadcrumb-item>
       <el-breadcrumb-item>角色管理</el-breadcrumb-item>
     </el-breadcrumb>
@@ -24,10 +24,7 @@
             <el-table-column prop="ID" label="ID"></el-table-column>
             <el-table-column prop="name" label="角色名"></el-table-column>
             <el-table-column prop="jurisdiction" label="权限"></el-table-column>
-            <el-table-column
-              prop="description"
-              label="权限描述"
-            ></el-table-column>
+            <el-table-column prop="description" label="权限描述"></el-table-column>
             <el-table-column prop="judgement" label="状态">
               <template>
                 <el-button
@@ -35,43 +32,64 @@
                   type="success"
                   round
                   @click="judegment(scope.$index, scope.row)"
-                  >已启用</el-button
-                >
+                >已启用</el-button>
               </template>
             </el-table-column>
-            <el-table-column prop="operation" label="操作">
+            <el-table-column prop="operation" label="操作" width="250">
               <template slot-scope="scope">
                 <el-button
                   size="mini"
                   type="info"
                   plain
                   @click="handleStop(scope.$index, scope.row)"
-                  >停用</el-button
-                >
-                <el-button
-                  plain
-                  size="mini"
-                  @click="handleEdit(scope.$index, scope.row)"
-                  >编辑</el-button
-                >
+                >停用</el-button>
+                <el-button plain size="mini" @click="handleEdit(scope.$index, scope.row)">编辑</el-button>
                 <el-button
                   size="mini"
                   type="danger"
                   plain
                   @click="handleDelete(scope.$index, scope.row)"
-                  >删除</el-button
-                >
+                >删除</el-button>
               </template>
             </el-table-column>
           </el-table-column>
         </el-table-column>
       </el-table>
     </div>
+    <!--对话框 Form 
+    角色名称charactor_name
+    角色标识(英文，唯一)charactor_psd
+    权限描述description
+    选择权限charactor_right
+    -->
+    <el-dialog title="添加角色" :visible.sync="dialogFormVisible">
+      <el-form :label-position="top">
+        <el-form-item label="角色名称" >
+          <el-input v-model="form.charactor_name" autocomplete="off" placeholder="请填写角色名称"></el-input>
+        </el-form-item>
+        <el-form-item label="(英文，唯一)角色标识"  >
+          <el-input v-model="form.charactor_psd" autocomplete="off" placeholder="请填写角色标识"></el-input>
+        </el-form-item>
+        <el-form-item label="权限描述" >
+          <el-input v-model="form.description" autocomplete="off" placeholder="请填写权限描述"></el-input>
+        </el-form-item>
+        <el-form-item label="选择权限" >
+          <el-select v-model="form.charactor_right" placeholder="请选择角色权限">
+            <el-option label="超级管理员" value="SuperAdministrator"></el-option>
+            <el-option label="管理员" value="Administrator"></el-option>
+          </el-select>
+        </el-form-item>
+      </el-form>
+      <div slot="footer" class="dialog-footer">
+        <el-button @click="dialogFormVisible = false">取 消</el-button>
+        <el-button type="primary" @click="dialogFormVisible = false">确 定</el-button>
+      </div>
+    </el-dialog>
   </div>
 </template>
 <script>
 export default {
-  data () {
+  data() {
     return {
       msg: "用户列表",
       tableData: [
@@ -79,50 +97,98 @@ export default {
           ID: "1",
           name: "admin",
           jurisdiction: "超级管理员",
-          description: "2020.2.21",
-
+          description: "2020.2.21"
         },
         {
           ID: "1",
           name: "admin",
           jurisdiction: "超级管理员",
-          description: "2020.2.21",
-
-        },
-
+          description: "2020.2.21"
+        }
       ],
-      renderHeader () {
-        return (
-          <div>
-            <el-button type="primary" icon="el-icon-circle-plus">添加管理员</el-button>
-          </div>
-        );
+           dialogTableVisible: false,
+      dialogFormVisible: false,
+      form: {
+        name: "",
+        region: "",
+        date1: "",
+        date2: "",
+        delivery: false,
+        type: [],
+        resource: "",
+        desc: ""
       },
-      //       tableHigth(){
-      // this.tableHeight = window.innerHeight - this.$refs.table.$el.offsetTop - 50;    
-      // //window.innerHeight:浏览器的可用高度    
-      // //this.$refs.table.$el.offsetTop：表格距离浏览器的高度    
-      // //后面的50：根据需求空出的高度，自行调整
-      //       }
+      formLabelWidth: "120px"
+    
     };
   },
   methods: {
-    handleStop (index, row) {
+    
+      renderHeader() {
+        return (
+          <div>
+            <el-button
+              type="primary"
+              icon="el-icon-circle-plus"
+              on-click={() => (this.dialogFormVisible = true)}
+            >
+              添加角色
+            </el-button>
+          </div>
+        );
+      },
+    handleStop(index, row) {
+      this.$confirm("确定要停用吗?", "信息", {
+        confirmButtonText: "确定",
+        cancelButtonText: "取消",
+        type: "info"
+      })
+        .then(() => {
+          this.$message({
+            type: "success",
+            message: "停用成功!"
+          });
+        })
+        .catch(() => {
+          this.$message({
+            type: "info",
+            message: "取消停用"
+          });
+        });
+
       console.log(index, row);
     },
-    handleEdit (index, row) {
+    handleEdit(index, row) {
       console.log(index, row);
     },
-    handleDelete (index, row) {
+   handleDelete(index, row) {
+      // 设置类似于console类型的功能
+      this.$confirm("删除该条信息, 是否继续?", "提示", {
+        confirmButtonText: "确定",
+        cancelButtonText: "取消",
+        type: "warning"
+      })
+        .then(() => {
+          // 移除对应索引位置的数据，可以对row进行设置向后台请求删除数据
+          this.tableData.splice(index, 1);
+          this.$message({
+            type: "success",
+            message: "删除成功!"
+          });
+        })
+        .catch(() => {
+          this.$message({
+            type: "info",
+            message: "已取消删除"
+          });
+        });
+
       console.log(index, row);
     },
-    judegment (index, row) {
+    judegment(index, row) {
       console.log(index, row);
     }
-
-
   }
-
 };
 </script>
 <style scoped>
