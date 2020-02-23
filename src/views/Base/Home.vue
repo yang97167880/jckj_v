@@ -14,7 +14,7 @@
         <el-menu-item @click="goCollapse">
           <i class="el-icon-menu"></i>
         </el-menu-item>
-        <el-menu-item class="font"> 基坑监测系统</el-menu-item>
+        <el-menu-item class="font1"> 基坑监测系统</el-menu-item>
         <el-submenu index="2">
           <template slot="title"><i class="el-icon-plus"></i>新增</template>
           <el-menu-item index="2-1"
@@ -136,11 +136,24 @@
         </el-main>
       </el-main>
       <!-- end -->
+
+      <!-- 用户注册对话框 -->
+      <el-dialog
+        modal-append-to-body="true"
+        custom-class="bg-col"
+        title="用户注册"
+        :visible.sync="dialogVisible"
+        width="50%"
+      >
+        <Dialog></Dialog>
+      </el-dialog>
     </el-container>
   </el-container>
 </template>
 <script>
+import Dialog from './Dialog'
 export default {
+  components: { Dialog, props: ['visible'] },
   data () {
     return {
       activeIndex: '2-1',
@@ -152,7 +165,8 @@ export default {
         title: '基坑沉降简介',
         name: '/index',
       }],
-      tabsMap: {        '/index': '基坑沉降简介',
+      tabsMap: {
+        '/index': '基坑沉降简介',
         '/TotalView': '总试图',
         '/DataView': '监测数据',
         '/RealData': '实时数据',
@@ -161,7 +175,8 @@ export default {
         '/AdminList': '管理员列表',
         '/SysLog': '系统日志'      },
       tabName: this.$route.path,
-      tabIndex: 2
+      tabIndex: 2,
+      dialogVisible: false
     };
   },
   created () {
@@ -194,6 +209,10 @@ export default {
 
     },
     handleSelect (key, keyPath) {
+      if (key == '2-1') {
+        this.dialogVisible = true;
+      }
+
       console.log(key, keyPath);
     },
     handleOpen (key, keyPath) {
@@ -224,15 +243,21 @@ export default {
           }
         });
       }
-
       this.editableTabsValue = activeName;
       this.editableTabs = tabs.filter(tab => tab.name !== targetName);
-    }
+    },
+
   }
 }
 </script>
 <style>
-.font {
+.font2 {
+  color: #ffffff;
+  font-weight: 500;
+  font-size: 25px;
+  text-align: center;
+}
+.font1 {
   font-size: 20px;
 }
 .el-menu-vertical-demo:not(.el-menu--collapse) {
@@ -261,5 +286,11 @@ export default {
 
 body > .el-container {
   margin-bottom: 40px;
+}
+
+.bg-col {
+  width: 50%;
+  position: relative;
+  background: linear-gradient(to bottom right, #50a3a2, #53e3a6);
 }
 </style>

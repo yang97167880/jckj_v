@@ -7,4 +7,5 @@
 <style>
 @import "./assets/css/main.css";
 @import "./theme/index.css";
+@import "./assets/css/wrap.css";
 </style>
