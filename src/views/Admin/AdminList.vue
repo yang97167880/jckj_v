@@ -63,34 +63,68 @@
     超级管理员 SuperAdministrator
     管理员 Administrator
      -->
-    <el-dialog title="注册信息填写" :visible.sync="dialogFormVisible">
-      <el-form :model="form">
-        <el-form-item label="用户名" :label-width="formLabelWidth">
-          <el-input v-model="form.name" autocomplete="off" placeholder="请填写用户名"></el-input>
+    <el-dialog title="注册信息填写" :visible.sync="dialogFormVisible" @close="closeDilog('ruleForm')" :append-to-body="true">
+      <el-form :model="ruleForm" :rules="rules" ref="ruleForm" >
+        <el-form-item label="用户名" :label-width="formLabelWidth" prop="account" >
+          <el-input v-model="ruleForm.account" autocomplete="off" placeholder="请填写用户名"></el-input>
         </el-form-item>
-        <el-form-item label="密码" :label-width="formLabelWidth">
-          <el-input v-model="form.psd" autocomplete="off" placeholder="请填写密码"></el-input>
+        <el-form-item label="密码" :label-width="formLabelWidth" prop="psd">
+          <el-input v-model="ruleForm.psd" autocomplete="off" placeholder="请填写密码"></el-input>
         </el-form-item>
-        <el-form-item label="重复密码" :label-width="formLabelWidth">
-          <el-input v-model="form.re_psd" autocomplete="off" placeholder="重复密码"></el-input>
+        <el-form-item label="重复密码" :label-width="formLabelWidth" prop="repsd">
+          <el-input v-model="ruleForm.repsd" autocomplete="off" placeholder="重复密码"></el-input>
         </el-form-item>
-        <el-form-item label="选择权限" :label-width="formLabelWidth">
-          <el-select v-model="form.charactor_right" placeholder="请选择角色权限">
+        <el-form-item label="选择权限" :label-width="formLabelWidth" prop="charactorRight">
+          <el-select v-model="ruleForm.charactorRight" placeholder="请选择角色权限">
             <el-option label="超级管理员" value="SuperAdministrator"></el-option>
             <el-option label="管理员" value="Administrator"></el-option>
           </el-select>
         </el-form-item>
-      </el-form>
+       </el-form>
       <div slot="footer" class="dialog-footer">
-        <el-button @click="dialogFormVisible = false">取 消</el-button>
-        <el-button type="primary" @click="dialogFormVisible = false">确 定</el-button>
+        <el-button @click="resetForm('ruleForm')">重置</el-button>
+        <el-button type="primary" @click="submitForm('ruleForm')">确定</el-button>
       </div>
+     
     </el-dialog>
   </div>
 </template>
 <script>
 export default {
   data() {
+      var checkAccount = (rule, value, callback) => {
+      if (!value) {
+        return callback(new Error("用户名不能为空"));
+      } else {
+        callback();
+      }
+    };
+    var checkPsd = (rule, value, callback) => {
+      if (value === "") {
+        callback(new Error("请输入密码"));
+      } else {
+        if (this.ruleForm.repsd !== "") {
+          this.$refs.ruleForm.validateField("repsd");
+        }
+        callback();
+      }
+    };
+    var checkRepsd = (rule, value, callback) => {
+      if (value === "") {
+        callback(new Error("请再次输入密码"));
+      } else if (value !== this.ruleForm.psd) {
+        callback(new Error("两次输入密码不一致!"));
+      } else {
+        callback();
+      }
+    };
+     var checkCharactorRight = (rule, value, callback) => {
+      if (!value) {
+        return callback(new Error("选择权限不能为空"));
+      } else {
+        callback();
+      }
+    };
     return {
       msg: "管理员列表",
       tableData: [
@@ -121,20 +155,45 @@ export default {
       ],
       dialogTableVisible: false,
       dialogFormVisible: false,
-      form: {
-        name: "",
-        region: "",
-        date1: "",
-        date2: "",
-        delivery: false,
-        type: [],
-        resource: "",
-        desc: ""
+      ruleForm: {
+        account:"",
+        psd:"",
+        repsd: "",
+        charactorRight: ""
+
       },
-      formLabelWidth: "120px"
+     rules: {
+        account: [{ validator: checkAccount, trigger: "blur" }],
+        psd: [{ validator: checkPsd, trigger: "blur" }],
+        repsd: [{ validator: checkRepsd, trigger: "blur" }],
+        charactorRight: [{ validator: checkCharactorRight, trigger: "blur" }]
+      },
+
     };
   },
   methods: {
+    closeDilog:function(form){
+    this.dialogFormVisible = false;
+    this.$refs[form].resetFields();//将form表单重置
+},
+      submitForm (formName) {
+      this.$refs[formName].validate((valid) => {
+        if (valid) {
+          alert('submit!');
+          console.log(this.ruleForm);
+         this.dialogFormVisible = false;//关闭窗口
+        } else {
+          console.log('error submit!!');
+          return false;
+        }
+      });
+    },
+    resetForm (formName) {
+       
+            // 点击取消 数据重置
+   
+      this.$refs[formName].resetFields();
+    },
     renderHeader() {
       return (
         <div>

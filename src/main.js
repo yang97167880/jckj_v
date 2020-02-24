@@ -10,6 +10,8 @@ import './plugins/element.js'
 Vue.config.productionTip = false;
 Vue.use(ElementUI, { size: 'small' });
 
+// //配置请求根路径
+// Vue.prototype.$http = axios
 Vue.prototype.$axios = axios
 new Vue({
   router,

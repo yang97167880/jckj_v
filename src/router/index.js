@@ -53,10 +53,8 @@ const routes = [
         path: '/UserAdmin',
         component: resolve => require(['../views/Admin/UserAdmin.vue'], resolve)
       },
-      {
-      path: '/AddList',
-        component: resolve => require(['../views/Admin/AddList.vue'], resolve)
-      },
+     
+     
       {
         path: '/',
         redirect: '/top'
