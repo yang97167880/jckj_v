@@ -8,6 +8,10 @@
 
 `Node >= 6`
 
+## Before Start
+npm install
+npm install echarts -S
+
 ## Start
 
  - Clone or download this repository
