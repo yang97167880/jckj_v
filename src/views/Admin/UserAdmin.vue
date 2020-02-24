@@ -62,34 +62,74 @@
     权限描述description
     选择权限charactor_right
     -->
-    <el-dialog title="添加角色" :visible.sync="dialogFormVisible">
-      <el-form :label-position="top">
-        <el-form-item label="角色名称" >
-          <el-input v-model="form.charactor_name" autocomplete="off" placeholder="请填写角色名称"></el-input>
+    <el-dialog
+      title="添加角色"
+      :visible.sync="dialogFormVisible"
+      @close="closeDilog('ruleForm')"
+      :append-to-body="true"
+    >
+      <el-form :label-position="top" :model="ruleForm" :rules="rules" ref="ruleForm">
+        <el-form-item label="角色名称" label-width="formLabelWidth" prop="charactorName">
+          <el-input v-model="ruleForm.charactorName" autocomplete="off" placeholder="请填写角色名称"></el-input>
         </el-form-item>
-        <el-form-item label="(英文，唯一)角色标识"  >
-          <el-input v-model="form.charactor_psd" autocomplete="off" placeholder="请填写角色标识"></el-input>
+        <el-form-item label="(英文，唯一)角色标识" label-width="formLabelWidth" prop="charactorPsd">
+          <el-input v-model="ruleForm.charactorPsd" autocomplete="off" placeholder="请填写角色标识"></el-input>
         </el-form-item>
-        <el-form-item label="权限描述" >
-          <el-input v-model="form.description" autocomplete="off" placeholder="请填写权限描述"></el-input>
+        <el-form-item label="权限描述" label-width="formLabelWidth" prop="description">
+          <el-input v-model="ruleForm.description" autocomplete="off" placeholder="请填写权限描述"></el-input>
         </el-form-item>
-        <el-form-item label="选择权限" >
-          <el-select v-model="form.charactor_right" placeholder="请选择角色权限">
+        <el-form-item label="选择权限" label-width="formLabelWidth" prop="charactorRight">
+          <el-select v-model="ruleForm.charactorRight" placeholder="请选择角色权限">
             <el-option label="超级管理员" value="SuperAdministrator"></el-option>
             <el-option label="管理员" value="Administrator"></el-option>
           </el-select>
         </el-form-item>
-      </el-form>
-      <div slot="footer" class="dialog-footer">
-        <el-button @click="dialogFormVisible = false">取 消</el-button>
-        <el-button type="primary" @click="dialogFormVisible = false">确 定</el-button>
-      </div>
+        </el-form>
+        <div slot="footer" class="dialog-footer">
+          <el-button @click="resetForm('ruleForm')">重置</el-button>
+          <el-button type="primary" @click="submitForm('ruleForm')">确 定</el-button>
+        </div>
+     
     </el-dialog>
   </div>
 </template>
 <script>
 export default {
   data() {
+    var checkCharactorName = (rule, value, callback) => {
+      if (!value) {
+        return callback(new Error("角色名不能为空"));
+      } else {
+        callback();
+      }
+    };
+    var checkCharactorPsd = (rule, value, callback) => {
+      var pwdReg = /^\w{1,16}$/;
+      // //验证是否全英文;
+      if (!value) {
+        return callback(new Error("标识不能为空"));
+      } else {
+        if (!pwdReg.test(value)) {
+          return callback(new Error("全英文1-16位"));
+        } else {
+          callback();
+        }
+      }
+    };
+    var checkDescription = (rule, value, callback) => {
+      if (!value) {
+        return callback(new Error("描述不能为空"));
+      } else {
+        callback();
+      }
+    };
+    var checkCharactorRight = (rule, value, callback) => {
+      if (!value) {
+        return callback(new Error("选择权限不能为空"));
+      } else {
+        callback();
+      }
+    };
     return {
       msg: "用户列表",
       tableData: [
@@ -106,37 +146,60 @@ export default {
           description: "2020.2.21"
         }
       ],
-           dialogTableVisible: false,
+      dialogTableVisible: false,
       dialogFormVisible: false,
-      form: {
-        name: "",
-        region: "",
-        date1: "",
-        date2: "",
-        delivery: false,
-        type: [],
-        resource: "",
-        desc: ""
+      ruleForm: {
+        charactorName: "",
+        charactorPsd: "",
+        description: "",
+        charactorRight:""
       },
-      formLabelWidth: "120px"
-    
+      // formLabelWidth: "120px",
+      rules: {
+        charactorName: [{ validator: checkCharactorName, trigger: "blur" }],
+        charactorPsd: [{ validator: checkCharactorPsd, trigger: "blur" }],
+        description: [{ validator: checkDescription, trigger: "blur" }],
+        charactorRight: [{ validator: checkCharactorRight, trigger: "blur" }]
+      }
     };
   },
   methods: {
-    
-      renderHeader() {
-        return (
-          <div>
-            <el-button
-              type="primary"
-              icon="el-icon-circle-plus"
-              on-click={() => (this.dialogFormVisible = true)}
-            >
-              添加角色
-            </el-button>
-          </div>
-        );
-      },
+    closeDilog: function(form) {
+      this.dialogFormVisible = false;
+      this.$refs[form].resetFields(); //将form表单重置
+    },
+    submitForm(formName) {
+      this.$refs[formName].validate(valid => {
+        if (valid) {
+          alert("submit!");
+          console.log(this.ruleForm);
+         this.dialogFormVisible = false;//关闭窗口
+        } else {
+          console.log("error submit!!");
+          return false;
+        }
+      });
+    },
+    resetForm(formName) {
+      
+      // 点击取消 数据重置
+
+      this.$refs[formName].resetFields();
+      
+    },
+    renderHeader() {
+      return (
+        <div>
+          <el-button
+            type="primary"
+            icon="el-icon-circle-plus"
+            on-click={() => (this.dialogFormVisible = true)}
+          >
+            添加角色
+          </el-button>
+        </div>
+      );
+    },
     handleStop(index, row) {
       this.$confirm("确定要停用吗?", "信息", {
         confirmButtonText: "确定",
@@ -161,7 +224,7 @@ export default {
     handleEdit(index, row) {
       console.log(index, row);
     },
-   handleDelete(index, row) {
+    handleDelete(index, row) {
       // 设置类似于console类型的功能
       this.$confirm("删除该条信息, 是否继续?", "提示", {
         confirmButtonText: "确定",
