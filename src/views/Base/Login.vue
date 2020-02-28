@@ -32,6 +32,7 @@
 </template>
 
 <script>
+import utils from "../../utils/utils"
 export default {
   name: 'Login',
   data () {
@@ -61,9 +62,32 @@ export default {
          //预验证
          if(valid) 
          {
-           alert('submit!');
-          console.log(this.ruleForm);
-          this.$router.replace('home')
+           let success=(Response)=>{
+             alert(Response.data.msg);
+           }
+           utils.axiosMethod({
+             method:"POST",
+             url:"/userLogin/",
+             data:this.ruleForm,
+             callback:success
+           })
+          // //post方式提交数据
+          //  this.axios({
+          //    method:"post",
+          //    url:"/user/login/",
+          //    data:this.qs.stringify({
+          //      account:'admin',
+          //      password:'123456'
+          //    })
+          //  })
+          // .then(function(res){
+          //   //接口成功返回结果执行
+          //   console.log(res.data);
+          // })
+          // .catch(function(err){
+          //   //请求失败或者接口返回失败或者.then()中的代码发生错误时执行
+          //   console.log(err);
+          // })
          }
          else {
             console.log('error submit!!');

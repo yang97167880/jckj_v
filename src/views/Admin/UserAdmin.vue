@@ -135,16 +135,29 @@ export default {
       tableData: [
         {
           ID: "1",
-          name: "admin",
-          jurisdiction: "超级管理员",
-          description: "2020.2.21"
+          name: "超级管理员",
+          jurisdiction: "superadimin",
+          description: "rule_all"
         },
         {
-          ID: "1",
-          name: "admin",
-          jurisdiction: "超级管理员",
-          description: "2020.2.21"
-        }
+          ID: "13",
+          name: "管理员",
+          jurisdiction: "admin",
+          description: "rule_admin"
+        },
+           {
+          ID: "16",
+          name: "111",
+          jurisdiction: "111",
+          description: "rule_admin"
+        },
+           {
+          ID: "17",
+          name: "管理员xzz",
+          jurisdiction: "xzz",
+          description: "rule_admin"
+        },
+      
       ],
       dialogTableVisible: false,
       dialogFormVisible: false,
@@ -222,6 +235,24 @@ export default {
       console.log(index, row);
     },
     handleEdit(index, row) {
+      this.$confirm("高程超出阈值", "警告", {
+        confirmButtonText: "确定",
+        cancelButtonText: "取消",
+        type: "warning"
+      })
+        .then(() => {
+          this.$message({
+            type: "success",
+            message: "停用成功!"
+          });
+        })
+        .catch(() => {
+          this.$message({
+            type: "info",
+            message: "取消停用"
+          });
+        });
+
       console.log(index, row);
     },
     handleDelete(index, row) {

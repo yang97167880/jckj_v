@@ -130,27 +130,21 @@ export default {
       tableData: [
         {
           ID: "1",
-          name: "admin",
+          name: "adimin",
           charactor: "超级管理员",
-          time: "2020.2.21"
+          time: "2019-05-07 01:09:40"
         },
         {
-          ID: "1",
-          name: "admin",
+          ID: "16",
+          name: "123456",
           charactor: "超级管理员",
-          time: "2020.2.21"
+          time: "2019-05-09 22:12:17"
         },
         {
-          ID: "1",
-          name: "admin",
-          charactor: "超级管理员",
-          time: "2020.2.21"
-        },
-        {
-          ID: "1",
-          name: "admin",
-          charactor: "超级管理员",
-          time: "2020.2.21"
+          ID: "17",
+          name: "xzze",
+          charactor: "管理员xzz",
+          time: "2019-05-11 11:38:53"
         }
       ],
       dialogTableVisible: false,
