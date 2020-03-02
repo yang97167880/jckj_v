@@ -5,10 +5,7 @@ const url = require('url')
 const publicPath = ''
 
 module.exports = (options = {}) => ({
-  dev:{
-    //Paths
-    assetsSubDirec
-  },
+
   entry: {
     vendor: './src/vendor',
     index: './src/main.js'
@@ -59,32 +56,22 @@ module.exports = (options = {}) => ({
     extensions: ['.js', '.vue', '.json', '.css']
   },
   devServer: {
-    historyApiFallback:true,
-    noInfo:true,
-    overlay:true,
-    proxy:{
-      '/userLogin/*':{
-                target:'http://localhost:8088',//后台地址
-                secure:false,
-                changeOrigin:true
-              }
-    },
  
-    // host: 'localhost',
-    // port: 8888,
-    // proxy: {
-    //   '/api/': {
-    //     target: 'http://localhost:8888',
-    //     changeOrigin: true,
-    //     pathRewrite: {
-    //       '^/api': ''
-    //     }
-    //   },
+    host: 'localhost',
+    port: 8888,
+    proxy: {
+      '/api/': {
+        target: 'http://localhost:8088',
+        changeOrigin: true,
+        pathRewrite: {
+          '^/api': ''
+        }
+      },
     
-    // },
-    // historyApiFallback: {
-    //   index: url.parse(options.dev ? '/assets/' : publicPath).pathname
-    // }
+    },
+    historyApiFallback: {
+      index: url.parse(options.dev ? '/assets/' : publicPath).pathname
+    }
   },
   devtool: options.dev ? '#eval-source-map' : '#source-map'
 })

@@ -32,7 +32,6 @@
 </template>
 
 <script>
-import utils from "../../utils/utils"
 export default {
   name: 'Login',
   data () {
@@ -62,33 +61,20 @@ export default {
          //预验证
          if(valid) 
          {
-           let success=(Response)=>{
-             alert(Response.data.msg);
-           }
-           utils.axiosMethod({
-             method:"POST",
-             url:"/userLogin/",
-             data:this.ruleForm,
-             callback:success
-           })
-          // //post方式提交数据
-          //  this.axios({
-          //    method:"post",
-          //    url:"/user/login/",
-          //    data:this.qs.stringify({
-          //      account:'admin',
-          //      password:'123456'
-          //    })
-          //  })
-          // .then(function(res){
-          //   //接口成功返回结果执行
-          //   console.log(res.data);
-          // })
-          // .catch(function(err){
-          //   //请求失败或者接口返回失败或者.then()中的代码发生错误时执行
-          //   console.log(err);
-          // })
-         }
+          
+          this.$axios.get('/admin/userLogin?password='+this.ruleForm.password+'&userName='+this.ruleForm.account).then((res)=>{	
+            console.log(res.data)//返回所有列的表头和状态				
+              console.log(res.data.data)//返回success
+              this.$router.push({path:'/top'})
+						
+					}).catch((error)=>{
+						console.log(error)
+						this.$alert('网络请求问题，联系管理员修复', '管理员的提示', {
+						    confirmButtonText: '确定'
+						});
+})
+        
+        }
          else {
             console.log('error submit!!');
             return false;
