@@ -30,8 +30,8 @@
           <el-menu-item index="3-2"
             ><i class="el-icon-connection"></i>切换用户</el-menu-item
           >
-          <el-menu-item index="3-3"
-            ><i class="el-icon-switch-button"></i>退出</el-menu-item
+          <el-menu-item index="3-3" @click="logout"
+            ><i class="el-icon-switch-button" ></i>退出</el-menu-item
           >
         </el-submenu>
         <span style="float:right;color:white">超级管理员</span>
@@ -183,6 +183,10 @@ export default {
 
   },
   methods: {
+    logout(){
+      window.sessionStorage.clear()
+      this.$router.push("/login");
+    },
     goCollapse () {
       this.isCollapse = !this.isCollapse;
     },
