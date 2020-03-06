@@ -19,18 +19,28 @@
         <el-table-column :render-header="renderHeader">
           <el-table-column label="管理员列表">
             <el-table-column type="selection" width="55"></el-table-column>
-            <el-table-column prop="ID" label="ID"></el-table-column>
-            <el-table-column prop="name" label="登录名"></el-table-column>
-            <el-table-column prop="charactor" label="角色"></el-table-column>
-            <el-table-column prop="time" label="加入时间"></el-table-column>
-            <el-table-column prop="judgement" label="是否已启用">
-              <template>
+            <el-table-column prop="uid" label="ID"></el-table-column>
+            <el-table-column prop="username" label="登录名"></el-table-column>
+            <el-table-column prop="title" label="角色"></el-table-column>
+            <el-table-column prop="createdAt" label="加入时间"></el-table-column>
+            <el-table-column prop="tel" label="手机号"></el-table-column>
+            <el-table-column prop="status" label="是否已启用">
+              <template slot-scope="scope">
+                <!-- {{scope.row}} 查看所有标头和数值-->
                 <el-button
                   size="mini"
                   type="success"
                   round
-                  @click="judegment(scope.$index, scope.row)"
+                  v-if="scope.row.status=='1'"
+                  @click="judegment(scope.$index, scope.row)"
                 >已启用</el-button>
+                <el-button
+                  size="mini"
+                  type="info"
+                  round
+                  v-if="scope.row.status=='2'"
+                  @click="judegment(scope.$index, scope.row)"
+                >已禁用</el-button>
               </template>
             </el-table-column>
             <el-table-column prop="operation" label="操作" width="250">
@@ -39,9 +49,18 @@
                   size="mini"
                   type="info"
                   plain
+                  v-if="scope.row.status=='1'"
                   @click="handleStop(scope.$index, scope.row)"
                 >停用</el-button>
-                <el-button plain size="mini" @click="handleEdit(scope.$index, scope.row)">编辑</el-button>
+                <el-button
+                  size="mini"
+                  type="success"
+                  plain
+                  v-if="scope.row.status=='2'"
+                  @click="handleStart(scope.$index, scope.row)"
+                >启用</el-button>
+
+                <el-button plain size="mini" @click="handleEdit(scope.row)">编辑</el-button>
                 <el-button
                   size="mini"
                   type="danger"
@@ -62,10 +81,15 @@
     选择权限form.charactor_right
     超级管理员 SuperAdministrator
     管理员 Administrator
-     -->
-    <el-dialog title="注册信息填写" :visible.sync="dialogFormVisible" @close="closeDilog('ruleForm')" :append-to-body="true">
-      <el-form :model="ruleForm" :rules="rules" ref="ruleForm" >
-        <el-form-item label="用户名" :label-width="formLabelWidth" prop="account" >
+    -->
+    <el-dialog
+      title="注册信息填写"
+      :visible.sync="dialogFormVisible"
+      @close="closeDilog('ruleForm')"
+      :append-to-body="true"
+    >
+      <el-form :model="ruleForm" :rules="rules" ref="ruleForm">
+        <el-form-item label="用户名" :label-width="formLabelWidth" prop="account">
           <el-input v-model="ruleForm.account" autocomplete="off" placeholder="请填写用户名"></el-input>
         </el-form-item>
         <el-form-item label="密码" :label-width="formLabelWidth" prop="psd">
@@ -80,112 +104,219 @@
             <el-option label="管理员" value="Administrator"></el-option>
           </el-select>
         </el-form-item>
-       </el-form>
+      </el-form>
       <div slot="footer" class="dialog-footer">
         <el-button @click="resetForm('ruleForm')">重置</el-button>
         <el-button type="primary" @click="submitForm('ruleForm')">确定</el-button>
       </div>
-     
+    </el-dialog>
+    <!-- 修改管理员信息对话框 -->
+    <el-dialog title="编辑管理员信息" :visible.sync="EditDialogVisible" width="50%"  @close="closeDilog('editFormRef')">
+      <el-form
+        :model="editForm"
+        :rules="editFormRules"
+        ref="editFormRef"
+        label-width="70px"
+        class="demo-ruleForm"
+      >
+        <el-form-item label="ID">
+          <el-input v-model="editForm.uid" disabled></el-input>
+        </el-form-item>
+        <el-form-item label="名称" prop="username">
+          <el-input v-model="editForm.username"></el-input>
+        </el-form-item>
+        <el-form-item label="角色" prop="title">
+          <el-input v-model="editForm.title"></el-input>
+        </el-form-item>
+        <el-form-item label="手机" prop="tel">
+          <el-input v-model="editForm.tel"></el-input>
+        </el-form-item>
+      </el-form>
+      <span slot="footer" class="dialog-footer">
+        <el-button @click="EditDialogVisible = false">取 消</el-button>
+        <el-button type="primary" @click="EditDialogVisible = false">确 定</el-button>
+      </span>
     </el-dialog>
   </div>
 </template>
 <script>
 export default {
   data() {
-      var checkAccount = (rule, value, callback) => {
-      if (!value) {
-        return callback(new Error("用户名不能为空"));
-      } else {
-        callback();
-      }
-    };
-    var checkPsd = (rule, value, callback) => {
-      if (value === "") {
-        callback(new Error("请输入密码"));
-      } else {
-        if (this.ruleForm.repsd !== "") {
-          this.$refs.ruleForm.validateField("repsd");
-        }
-        callback();
-      }
-    };
-    var checkRepsd = (rule, value, callback) => {
-      if (value === "") {
-        callback(new Error("请再次输入密码"));
-      } else if (value !== this.ruleForm.psd) {
-        callback(new Error("两次输入密码不一致!"));
-      } else {
-        callback();
-      }
-    };
-     var checkCharactorRight = (rule, value, callback) => {
-      if (!value) {
-        return callback(new Error("选择权限不能为空"));
-      } else {
-        callback();
-      }
-    };
+    var checkTel = (rule, value, callback) => {
+      if (!value) {
+        return callback(new Error("联系电话不能为空"));
+      }
+     else{
+        const regTel= /^((13[0-9])|(17[0-1,6-8])|(15[^4,\\D])|(18[0-9]))\d{8}$/
+        if (!regTel.test(value)) {
+            return callback(new Error("请输入合法手机号"));
+       }
+       else{
+             callback();
+           }     
+     }
+     
+    };
+    var checkAccount = (rule, value, callback) => {
+      if (!value) {
+        return callback(new Error("用户名不能为空"));
+      } else {
+        callback();
+      }
+    };
+    var checkPsd = (rule, value, callback) => {
+      if (value === "") {
+        callback(new Error("请输入密码"));
+      } else {
+        if (this.ruleForm.repsd !== "") {
+          this.$refs.ruleForm.validateField("repsd");
+        }
+        callback();
+      }
+    };
+    var checkRepsd = (rule, value, callback) => {
+      if (value === "") {
+        callback(new Error("请再次输入密码"));
+      } else if (value !== this.ruleForm.psd) {
+        callback(new Error("两次输入密码不一致!"));
+      } else {
+        callback();
+      }
+    };
+    var checkCharactorRight = (rule, value, callback) => {
+      if (!value) {
+        return callback(new Error("选择权限不能为空"));
+      } else {
+        callback();
+      }
+    };
     return {
       msg: "管理员列表",
       tableData: [
-        {
-          ID: "1",
-          name: "adimin",
-          charactor: "超级管理员",
-          time: "2019-05-07 01:09:40"
-        },
-        {
-          ID: "16",
-          name: "123456",
-          charactor: "超级管理员",
-          time: "2019-05-09 22:12:17"
-        },
-        {
-          ID: "17",
-          name: "xzze",
-          charactor: "管理员xzz",
-          time: "2019-05-11 11:38:53"
-        }
+        // {
+        //   ID: "1",
+        //   name: "adimin",
+        //   charactor: "超级管理员",
+        //   time: "2019-05-07 01:09:40"
+        // },
       ],
+      // 编辑角色信息展示
+      EditDialogVisible: false,
       dialogTableVisible: false,
       dialogFormVisible: false,
+      // 添加管理员表单验证
       ruleForm: {
-        account:"",
-        psd:"",
-        repsd: "",
-        charactorRight: ""
-
+        account: "",
+        psd: "",
+        repsd: "",
+        charactorRight: ""
       },
-     rules: {
-        account: [{ validator: checkAccount, trigger: "blur" }],
-        psd: [{ validator: checkPsd, trigger: "blur" }],
-        repsd: [{ validator: checkRepsd, trigger: "blur" }],
-        charactorRight: [{ validator: checkCharactorRight, trigger: "blur" }]
-      },
-
+      // 查询管理员信息
+      editForm: {},
+      //
+      editFormRules: {
+        username: [
+          {
+            require: true,
+            message: "请输入名称",
+            trigger: "blur"
+          },
+          {
+            validator: checkAccount,
+            trigger: "blur"
+          }
+        ],
+        tel: [
+          {
+            require: true,
+            message: "请输入手机号",
+            trigger: "blur"
+          },
+          {
+            validator: checkTel,
+            trigger: "blur"
+          }
+        ],
+        title: [
+          {
+            require: true,
+            message: "请输入角色",
+            trigger: "blur"
+          },
+          {
+            validator: checkCharactorRight,
+            trigger: "blur"
+          }
+        ]
+      },
+      //  表单预验证规则
+      rules: {
+        account: [{ validator: checkAccount, trigger: "blur" }],
+        psd: [{ validator: checkPsd, trigger: "blur" }],
+        repsd: [{ validator: checkRepsd, trigger: "blur" }],
+        charactorRight: [{ validator: checkCharactorRight, trigger: "blur" }]
+      }
     };
   },
+
+  // 周期函数
+  created() {
+    this.getUserList();
+  },
+
   methods: {
-    closeDilog:function(form){
-    this.dialogFormVisible = false;
-    this.$refs[form].resetFields();//将form表单重置
-},
-      submitForm (formName) {
-      this.$refs[formName].validate((valid) => {
+    async getUserList() {
+      // 获取用户列表请求
+      const { data: res } = await this.$axios
+        .get("/admin/getUserList", {
+          params: {
+            pageNo: 1,
+            pageSize: 5
+          }
+        })
+        .then(res => {
+          if (res.status == "200") {
+            this.$message.success("管理员信息获取成功");
+            console.log(res);
+            console.log(res.data);
+            (this.tableData = res.data.data.list),
+              (this.pageCount = res.data.data.pageCount),
+              (this.pageRows = res.data.data.pageRows);
+          }
+        })
+        .catch(error => {
+          console.log(error);
+          this.$alert("网络请求问题，联系管理员修复", "管理员的提示", {
+            confirmButtonText: "确定"
+          });
+        });
+    },
+    // //关闭管理员编辑对话框监听事件
+    // EditDialogClosed: function(form){
+    //     this.dialogFormVisible = false;
+    //     this.$refs[form].resetFields();
+     
+    
+    // },
+    closeDilog: function(form) {
+      this.dialogFormVisible = false;
+      this.$refs[form].resetFields(); //将form表单重置
+    },
+    submitForm(formName) {
+      this.$refs[formName].validate(valid => {
         if (valid) {
-          alert('submit!');
+          alert("submit!");
           console.log(this.ruleForm);
-         this.dialogFormVisible = false;//关闭窗口
+          this.dialogFormVisible = false; //关闭窗口
         } else {
-          console.log('error submit!!');
+          console.log("error submit!!");
           return false;
         }
       });
     },
-    resetForm (formName) {
-       
-            // 点击取消 数据重置
-   
+    resetForm(formName) {
+      // 点击取消 数据重置
+
       this.$refs[formName].resetFields();
     },
     renderHeader() {
@@ -201,7 +332,29 @@ export default {
         </div>
       );
     },
+    // 启用窗口
+    handleStart(index, row) {
+      this.$confirm("确定要启用吗?", "信息", {
+        confirmButtonText: "确定",
+        cancelButtonText: "取消",
+        type: "info"
+      })
+        .then(() => {
+          this.$message({
+            type: "success",
+            message: "启用成功!"
+          });
+        })
+        .catch(() => {
+          this.$message({
+            type: "info",
+            message: "取消启用"
+          });
+        });
 
+      console.log(index, row);
+    },
+    // 停用窗口
     handleStop(index, row) {
       this.$confirm("确定要停用吗?", "信息", {
         confirmButtonText: "确定",
@@ -223,8 +376,28 @@ export default {
 
       console.log(index, row);
     },
-    handleEdit(index, row) {
-      console.log(index, row);
+    // 管理员信息编辑窗口
+    async handleEdit(row) {
+      // console.log(row.uid);//点击的id
+      // this.EditDialogVisible = true;
+      const { data: res } = await this.$axios
+        .get("/admin/getUserInfo?uid=" + row.uid)
+        .then(res => {
+          if (res.status == "200") {
+            console.log(res.data);
+            console.log(res.data.data);
+            this.editForm = res.data.data;
+            this.EditDialogVisible = true;
+          } else {
+            this.$message.error("管理员信息获取失败！！！");
+          }
+        })
+        .catch(error => {
+          console.log(error);
+          this.$alert("网络请求问题，联系管理员修复", "管理员的提示", {
+            confirmButtonText: "确定"
+          });
+        });
     },
     handleDelete(index, row) {
       // 设置类似于console类型的功能

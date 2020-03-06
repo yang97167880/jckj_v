@@ -62,7 +62,7 @@
                   @click="handleStart(scope.$index, scope.row)"
                 >启用</el-button>
 
-                <el-button plain size="mini" @click="handleEdit(scope.$index, scope.row)">编辑</el-button>
+                <el-button plain size="mini" @click="handleEdit(scope.row)">编辑</el-button>
                 <el-button
                   size="mini"
                   type="danger"
@@ -75,7 +75,7 @@
         </el-table-column>
       </el-table>
     </div>
-    <!--对话框 Form 
+    <!--添加对话框 Form 
     角色名称charactor_name
     角色标识(英文，唯一)charactor_psd
     权限描述description
@@ -109,6 +109,40 @@
         <el-button type="primary" @click="submitForm('ruleForm')">确 定</el-button>
       </div>
     </el-dialog>
+  <!-- 修改角色信息对话框 -->
+    <el-dialog
+       title="编辑角色信息"
+      :visible.sync="EditDialogVisible"
+       width="50%"
+      >
+  <el-form
+        :model="editForm"
+        :rules="editFormRules"
+        ref="editFormRef"
+        label-width="70px"
+        class="demo-ruleForm"
+      >
+     <el-form-item label="ID">
+          <el-input v-model="editForm.roleId" disabled></el-input>
+        </el-form-item>
+        <el-form-item label="角色名" prop="name">
+          <el-input v-model="editForm.name"></el-input>
+        </el-form-item>
+        <el-form-item label="权限" prop="detail">
+          <el-input v-model="editForm.detail"></el-input>
+        </el-form-item>
+        <el-form-item label="权限描述" prop="title">
+          <el-input v-model="editForm.title"></el-input>
+        </el-form-item>
+      </el-form>
+      <span slot="footer" class="dialog-footer">
+        <el-button @click="EditDialogVisible = false">取 消</el-button>
+        <el-button type="primary" @click="EditDialogVisible = false">确 定</el-button>
+      </span>
+      </el-dialog>
+
+
+
   </div>
 </template>
 <script>
@@ -150,7 +184,8 @@ export default {
     };
     return {
       msg: "用户列表",
-
+       // 编辑角色信息展示
+      EditDialogVisible:false,
       tableData: [
         // {
         // ID: "1",
@@ -176,16 +211,54 @@ export default {
         charactorPsd: [{ validator: checkCharactorPsd, trigger: "blur" }],
         description: [{ validator: checkDescription, trigger: "blur" }],
         charactorRight: [{ validator: checkCharactorRight, trigger: "blur" }]
-      }
+      },
+       // 查询角色信息
+        editForm: {},
+      //编辑角色信息
+      editFormRules: {
+        name: [
+          {
+            require: true,
+            message: "请输入名称",
+            trigger: "blur"
+          },
+          {
+            validator: checkCharactorName,
+            trigger: "blur"
+          }
+        ],
+        detail: [
+          {
+            require: true,
+            message: "请输入权限",
+            trigger: "blur"
+          },
+          {
+            validator: checkCharactorRight,
+            trigger: "blur"
+          }
+        ],
+        title: [
+          {
+            require: true,
+            message: "请输入权限描述",
+            trigger: "blur"
+          },
+          {
+            validator: checkDescription,
+            trigger: "blur"
+          }
+        ]
+      },
     };
   },
 
   // 周期函数
   created() {
-    this.getUserList();
+    this.getRoleList();
   },
   methods: {
-    async getUserList() {
+    async getRoleList() {
       // 获取用户列表请求
       const { data: res } = await this.$axios
         .get("/admin/getRoleList", {
@@ -196,7 +269,7 @@ export default {
         })
         .then(res => {
           if (res.status == "200"){
-          this.$message.success('用户信息获取成功') 
+          this.$message.success('角色信息获取成功') 
           console.log(res);
           console.log(res.data);
           this.tableData =res.data.data.list,
@@ -246,7 +319,7 @@ export default {
       );
     },
  // 启用窗口
-     handleStop(index, row) {
+     handleStart(index, row) {
       this.$confirm("确定要启用吗?", "信息", {
         confirmButtonText: "确定",
         cancelButtonText: "取消",
@@ -289,27 +362,12 @@ export default {
 
       console.log(index, row);
     },
-    // 编辑窗口
-    handleEdit(index, row) {
-      this.$confirm("高程超出阈值", "警告", {
-        confirmButtonText: "确定",
-        cancelButtonText: "取消",
-        type: "warning"
-      })
-        .then(() => {
-          this.$message({
-            type: "success",
-            message: "停用成功!"
-          });
-        })
-        .catch(() => {
-          this.$message({
-            type: "info",
-            message: "取消停用"
-          });
-        });
-
-      console.log(index, row);
+    // 编辑角色窗口
+    handleEdit(row) {
+      //console.log(row.roleId);
+      this.EditDialogVisible = true;
+      //等接口来再写
+      // this.$axios.get('')
     },
     // 删除窗口
     handleDelete(index, row) {

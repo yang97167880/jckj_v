@@ -24,8 +24,8 @@
 
         <el-submenu index="3" style="float:right">
           <template slot="title"><i class="el-icon-plus"></i>admin</template>
-          <el-menu-item index="3-1"
-            ><i class="el-icon-s-check"></i>个人信息</el-menu-item
+          <el-menu-item index="3-1" @click =" personalInformation "
+            ><i class="el-icon-s-check" ></i>个人信息</el-menu-item
           >
           <el-menu-item index="3-2"
             ><i class="el-icon-connection"></i>切换用户</el-menu-item
@@ -147,6 +147,48 @@
       >
         <Dialog></Dialog>
       </el-dialog>
+      <!-- 用户个人信息显示对话框 -->
+      <el-dialog
+        title="用户个人信息"
+        :visible.sync="personalDialogVisible"
+        width="50%"
+      >
+       <el-form
+        :model="showForm"
+        :rules="showFormRules"
+        ref="showFormRef"
+        label-width="100px"
+        class="demo-ruleForm"
+      >
+      
+        <el-form-item label="用户ID">
+         {{ uid }}
+        </el-form-item>
+        <el-form-item label="用户名:">
+         {{username }}
+        </el-form-item>
+         <el-form-item label="权限:">
+         {{  title }}
+        </el-form-item>
+         <el-form-item label="创建时间:">
+         {{ createdAt }}
+        </el-form-item>
+         <el-form-item label="手机:">
+         {{  tel }}
+        </el-form-item>
+         
+       </el-form>
+      <!-- <span>用户ID:{{ uid }}</span>
+      <p><span>用户名:{{ username }}</span></p>
+      <p><span>权限:{{ title }}</span></p>
+      <p><span>创建时间:{{ createdAt }}</span></p>
+      <p><span>手机:{{ tel }}</span></p> -->
+        <span slot="footer" class="dialog-footer">
+        <el-button @click="personalDialogVisible = false">取 消</el-button>
+        <el-button type="primary" @click="personalDialogVisible = false">确 定</el-button>
+      </span>
+      </el-dialog>
+
     </el-container>
   </el-container>
 </template>
@@ -156,6 +198,9 @@ export default {
   components: { Dialog, props: ['visible'] },
   data () {
     return {
+      // msg:"nihao",
+      // 用户个人信息展示
+      personalDialogVisible:false,
       activeIndex: '2-1',
       activeIndex2: this.$route.path,
       isCollapse: false,
@@ -179,10 +224,39 @@ export default {
       dialogVisible: false
     };
   },
-  created () {
-
+    // 周期函数
+  created() {
+  
   },
   methods: {
+  //  展示个人用户信息
+  async  personalInformation(){
+    
+   
+        const { data: res } = await this.$axios
+        .get("/admin/getUserInfo?uid=1") .then(res => {
+          
+          if (res.data.status == "success") {
+            this.$message.success("获取个人信息成功");
+            console.log(res.data.data);
+
+            this.uid=res.data.data.uid
+            this.username=res.data.data.username
+            this.title=res.data.data.title
+            this.createdAt=res.data.data.createdAt
+            this.tel=res.data.data.tel
+            this.personalDialogVisible = true;
+         
+          }
+        })
+        .catch(error => {
+          console.log(error);
+          this.$alert("网络请求问题，联系管理员修复", "管理员的提示", {
+            confirmButtonText: "确定"
+          });
+        });
+    },
+  
     logout(){
       window.sessionStorage.clear()
       this.$router.push("/login");
