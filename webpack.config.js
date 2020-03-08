@@ -5,6 +5,7 @@ const url = require('url')
 const publicPath = ''
 
 module.exports = (options = {}) => ({
+
   entry: {
     vendor: './src/vendor',
     index: './src/main.js'
@@ -55,16 +56,18 @@ module.exports = (options = {}) => ({
     extensions: ['.js', '.vue', '.json', '.css']
   },
   devServer: {
+ 
     host: 'localhost',
     port: 8888,
     proxy: {
       '/api/': {
-        target: 'http://localhost:8888',
+        target: 'http://localhost:8088',
         changeOrigin: true,
         pathRewrite: {
           '^/api': ''
         }
-      }
+      },
+    
     },
     historyApiFallback: {
       index: url.parse(options.dev ? '/assets/' : publicPath).pathname

@@ -61,10 +61,29 @@ export default {
          //预验证
          if(valid) 
          {
-           alert('submit!');
-          console.log(this.ruleForm);
-          this.$router.replace('home')
-         }
+          
+          this.$axios.get('/admin/userLogin?password='+this.ruleForm.password+'&userName='+this.ruleForm.account).then((res)=>{	
+            console.log(res)
+            console.log(res.data)//返回所有列的表头和状态				
+              console.log(res.data.data)//返回success
+              if(res.data.data =='success'){
+                this.$message.success('登陆成功')
+                //登陆成功后的token 保存到客户端sessionStorage中
+                //项目中除了登陆之外的其他api必须登陆后才可访问
+                window.sessionStorage.setItem('token',res.data.token)
+                this.$router.push({path:'/top'})}
+              else{
+                  return this.$message.error("登陆失败")
+                }
+						
+					}).catch((error)=>{
+						console.log(error)
+						this.$alert('网络请求问题，联系管理员修复', '管理员的提示', {
+						    confirmButtonText: '确定'
+						});
+})
+        
+        }
          else {
             console.log('error submit!!');
             return false;

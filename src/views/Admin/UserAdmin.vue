@@ -13,7 +13,7 @@
         :data="tableData"
         tooltip-effect="dark"
         border
-        height="tableHeight"
+      
         style="width: 100%;
           margin: auto"
         @selection-change="handleSelectionChange"
@@ -21,18 +21,28 @@
         <el-table-column :render-header="renderHeader">
           <el-table-column label="角色管理">
             <el-table-column type="selection" width="55"></el-table-column>
-            <el-table-column prop="ID" label="ID"></el-table-column>
+            <el-table-column prop="roleId" label="ID"></el-table-column>
             <el-table-column prop="name" label="角色名"></el-table-column>
-            <el-table-column prop="jurisdiction" label="权限"></el-table-column>
-            <el-table-column prop="description" label="权限描述"></el-table-column>
-            <el-table-column prop="judgement" label="状态">
-              <template>
+            <el-table-column prop="detail" label="权限"></el-table-column>
+            <el-table-column prop="title" label="权限描述"></el-table-column>
+            <el-table-column prop="status" label="状态">
+              <template slot-scope="scope">
+                <!-- {{scope.row}} 查看所有标头和数值-->
                 <el-button
                   size="mini"
                   type="success"
                   round
-                  @click="judegment(scope.$index, scope.row)"
+                  v-if="scope.row.status=='1'"
+                  @click="judegment(scope.$index, scope.row)" 
                 >已启用</el-button>
+                 <el-button
+                  size="mini"
+                  type="info"
+                  round
+                  v-if="scope.row.status=='2'"
+                  @click="judegment(scope.$index, scope.row)" 
+                >已禁用</el-button>
+                 
               </template>
             </el-table-column>
             <el-table-column prop="operation" label="操作" width="250">
@@ -41,9 +51,18 @@
                   size="mini"
                   type="info"
                   plain
+                  v-if="scope.row.status=='1'"
                   @click="handleStop(scope.$index, scope.row)"
                 >停用</el-button>
-                <el-button plain size="mini" @click="handleEdit(scope.$index, scope.row)">编辑</el-button>
+                <el-button
+                  size="mini"
+                  type="success"
+                  plain
+                  v-if="scope.row.status=='2'"
+                  @click="handleStart(scope.$index, scope.row)"
+                >启用</el-button>
+
+                <el-button plain size="mini" @click="handleEdit(scope.row)">编辑</el-button>
                 <el-button
                   size="mini"
                   type="danger"
@@ -56,7 +75,7 @@
         </el-table-column>
       </el-table>
     </div>
-    <!--对话框 Form 
+    <!--添加对话框 Form 
     角色名称charactor_name
     角色标识(英文，唯一)charactor_psd
     权限描述description
@@ -84,13 +103,46 @@
             <el-option label="管理员" value="Administrator"></el-option>
           </el-select>
         </el-form-item>
-        </el-form>
-        <div slot="footer" class="dialog-footer">
-          <el-button @click="resetForm('ruleForm')">重置</el-button>
-          <el-button type="primary" @click="submitForm('ruleForm')">确 定</el-button>
-        </div>
-     
+      </el-form>
+      <div slot="footer" class="dialog-footer">
+        <el-button @click="resetForm('ruleForm')">重置</el-button>
+        <el-button type="primary" @click="submitForm('ruleForm')">确 定</el-button>
+      </div>
     </el-dialog>
+  <!-- 修改角色信息对话框 -->
+    <el-dialog
+       title="编辑角色信息"
+      :visible.sync="EditDialogVisible"
+       width="50%"
+      >
+  <el-form
+        :model="editForm"
+        :rules="editFormRules"
+        ref="editFormRef"
+        label-width="70px"
+        class="demo-ruleForm"
+      >
+     <el-form-item label="ID">
+          <el-input v-model="editForm.roleId" disabled></el-input>
+        </el-form-item>
+        <el-form-item label="角色名" prop="name">
+          <el-input v-model="editForm.name"></el-input>
+        </el-form-item>
+        <el-form-item label="权限" prop="detail">
+          <el-input v-model="editForm.detail"></el-input>
+        </el-form-item>
+        <el-form-item label="权限描述" prop="title">
+          <el-input v-model="editForm.title"></el-input>
+        </el-form-item>
+      </el-form>
+      <span slot="footer" class="dialog-footer">
+        <el-button @click="EditDialogVisible = false">取 消</el-button>
+        <el-button type="primary" @click="EditDialogVisible = false">确 定</el-button>
+      </span>
+      </el-dialog>
+
+
+
   </div>
 </template>
 <script>
@@ -132,38 +184,106 @@ export default {
     };
     return {
       msg: "用户列表",
+       // 编辑角色信息展示
+      EditDialogVisible:false,
       tableData: [
-        {
-          ID: "1",
-          name: "admin",
-          jurisdiction: "超级管理员",
-          description: "2020.2.21"
-        },
-        {
-          ID: "1",
-          name: "admin",
-          jurisdiction: "超级管理员",
-          description: "2020.2.21"
-        }
+        // {
+        // ID: "1",
+        // name: "超级管理员",
+        // jurisdiction: "superadimin",
+        // description: "rule_all"
+        // },
       ],
+      pageCount: 0,
+      pageRows: 0,
       dialogTableVisible: false,
       dialogFormVisible: false,
       ruleForm: {
         charactorName: "",
         charactorPsd: "",
         description: "",
-        charactorRight:""
+        charactorRight: ""
       },
-      // formLabelWidth: "120px",
+
+      // 表单规则
       rules: {
         charactorName: [{ validator: checkCharactorName, trigger: "blur" }],
         charactorPsd: [{ validator: checkCharactorPsd, trigger: "blur" }],
         description: [{ validator: checkDescription, trigger: "blur" }],
         charactorRight: [{ validator: checkCharactorRight, trigger: "blur" }]
-      }
+      },
+       // 查询角色信息
+        editForm: {},
+      //编辑角色信息
+      editFormRules: {
+        name: [
+          {
+            require: true,
+            message: "请输入名称",
+            trigger: "blur"
+          },
+          {
+            validator: checkCharactorName,
+            trigger: "blur"
+          }
+        ],
+        detail: [
+          {
+            require: true,
+            message: "请输入权限",
+            trigger: "blur"
+          },
+          {
+            validator: checkCharactorRight,
+            trigger: "blur"
+          }
+        ],
+        title: [
+          {
+            require: true,
+            message: "请输入权限描述",
+            trigger: "blur"
+          },
+          {
+            validator: checkDescription,
+            trigger: "blur"
+          }
+        ]
+      },
     };
   },
+
+  // 周期函数
+  created() {
+    this.getRoleList();
+  },
   methods: {
+    async getRoleList() {
+      // 获取用户列表请求
+      const { data: res } = await this.$axios
+        .get("/admin/getRoleList", {
+          params: {
+            pageNo: 1,
+            pageSize: 5
+          }
+        })
+        .then(res => {
+          if (res.status == "200"){
+          this.$message.success('角色信息获取成功') 
+          console.log(res);
+          console.log(res.data);
+          this.tableData =res.data.data.list,
+          this.pageCount=res.data.data.pageCount,
+          this.pageRows=res.data.data.pageRows
+          }
+        })
+        .catch(error => {
+          console.log(error);
+          this.$alert("网络请求问题，联系管理员修复", "管理员的提示", {
+            confirmButtonText: "确定"
+          });
+        });
+    },
     closeDilog: function(form) {
       this.dialogFormVisible = false;
       this.$refs[form].resetFields(); //将form表单重置
@@ -173,7 +293,7 @@ export default {
         if (valid) {
           alert("submit!");
           console.log(this.ruleForm);
-         this.dialogFormVisible = false;//关闭窗口
+          this.dialogFormVisible = false; //关闭窗口
         } else {
           console.log("error submit!!");
           return false;
@@ -181,11 +301,9 @@ export default {
       });
     },
     resetForm(formName) {
-      
       // 点击取消 数据重置
 
       this.$refs[formName].resetFields();
-      
     },
     renderHeader() {
       return (
@@ -200,6 +318,29 @@ export default {
         </div>
       );
     },
+ // 启用窗口
+     handleStart(index, row) {
+      this.$confirm("确定要启用吗?", "信息", {
+        confirmButtonText: "确定",
+        cancelButtonText: "取消",
+        type: "info"
+      })
+        .then(() => {
+          this.$message({
+            type: "success",
+            message: "启用成功!"
+          });
+        })
+        .catch(() => {
+          this.$message({
+            type: "info",
+            message: "取消启用"
+          });
+        });
+
+      console.log(index, row);
+    },
+    // 停用窗口
     handleStop(index, row) {
       this.$confirm("确定要停用吗?", "信息", {
         confirmButtonText: "确定",
@@ -221,9 +362,14 @@ export default {
 
       console.log(index, row);
     },
-    handleEdit(index, row) {
-      console.log(index, row);
+    // 编辑角色窗口
+    handleEdit(row) {
+      //console.log(row.roleId);
+      this.EditDialogVisible = true;
+      //等接口来再写
+      // this.$axios.get('')
     },
+    // 删除窗口
     handleDelete(index, row) {
       // 设置类似于console类型的功能
       this.$confirm("删除该条信息, 是否继续?", "提示", {
@@ -248,6 +394,8 @@ export default {
 
       console.log(index, row);
     },
+
+    //判断按钮状态绑定
     judegment(index, row) {
       console.log(index, row);
     }
