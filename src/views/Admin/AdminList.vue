@@ -7,15 +7,18 @@
       <el-breadcrumb-item>管理员管理</el-breadcrumb-item>
       <el-breadcrumb-item>管理员列表</el-breadcrumb-item>
     </el-breadcrumb>
-    <div class="container" style="border:0px">
+    <!-- 卡片视图区域 -->
+    <el-card>
+      <!-- +添加管理员 -->
       <el-table
         ref="multipleTable"
-        :data="tableData"
+        :data="userlist"
         tooltip-effect="dark"
         border
         style="width: 100%"
         @selection-change="handleSelectionChange"
       >
+        <!-- 管理员列表界面 -->
         <el-table-column :render-header="renderHeader">
           <el-table-column label="管理员列表">
             <el-table-column type="selection" width="55"></el-table-column>
@@ -38,7 +41,7 @@
                   size="mini"
                   type="info"
                   round
-                  v-if="scope.row.status=='2'"
+                  v-if="scope.row.status=='0'"
                   @click="judegment(scope.$index, scope.row)"
                 >已禁用</el-button>
               </template>
@@ -56,8 +59,8 @@
                   size="mini"
                   type="success"
                   plain
-                  v-if="scope.row.status=='2'"
-                  @click="handleStart(scope.$index, scope.row)"
+                  v-if="scope.row.status=='0'"
+                  @click="handleStart(scope.$index,scope.row)"
                 >启用</el-button>
 
                 <el-button plain size="mini" @click="handleEdit(scope.row)">编辑</el-button>
@@ -72,9 +75,22 @@
           </el-table-column>
         </el-table-column>
       </el-table>
-    </div>
+   <!-- 分页区页面 -->   
+      <div class="block">
+        
+        <el-pagination
+          @size-change="handleSizeChange"
+          @current-change="handleCurrentChange"
+          :current-page="queryInfo.pageNo"
+          :page-sizes="[1, 3, 5, 10]"
+          :page-size="queryInfo.pageSize"
+          layout="total, sizes, prev, pager, next, jumper"
+          :total="total"
+        ></el-pagination>
+      </div>
+    </el-card>
 
-    <!--对话框 Form
+    <!--编辑管理员 对话框 Form
     用户名form.name
     密码form.psd
     重复密码form.re_psd
@@ -111,7 +127,12 @@
       </div>
     </el-dialog>
     <!-- 修改管理员信息对话框 -->
-    <el-dialog title="编辑管理员信息" :visible.sync="EditDialogVisible" width="50%"  @close="closeDilog('editFormRef')">
+    <el-dialog
+      title="编辑管理员信息"
+      :visible.sync="EditDialogVisible"
+      width="50%"
+      @close="closeDilog('editFormRef')"
+    >
       <el-form
         :model="editForm"
         :rules="editFormRules"
@@ -141,21 +162,21 @@
 </template>
 <script>
 export default {
+  // uid: '',
+  inject: ["reload"],
   data() {
+   
     var checkTel = (rule, value, callback) => {
       if (!value) {
         return callback(new Error("联系电话不能为空"));
+      } else {
+        const regTel = /^((13[0-9])|(17[0-1,6-8])|(15[^4,\\D])|(18[0-9]))\d{8}$/;
+        if (!regTel.test(value)) {
+          return callback(new Error("请输入合法手机号"));
+        } else {
+          callback();
+        }
       }
-     else{
-        const regTel= /^((13[0-9])|(17[0-1,6-8])|(15[^4,\\D])|(18[0-9]))\d{8}$/
-        if (!regTel.test(value)) {
-            return callback(new Error("请输入合法手机号"));
-       }
-       else{
-             callback();
-           }     
-     }
-     
     };
     var checkAccount = (rule, value, callback) => {
       if (!value) {
@@ -192,18 +213,26 @@ export default {
     };
     return {
       msg: "管理员列表",
-      tableData: [
-        // {
-        //   ID: "1",
-        //   name: "adimin",
-        //   charactor: "超级管理员",
-        //   time: "2019-05-07 01:09:40"
-        // },
-      ],
+      // uid: " ",
+      //管理员列表信息参数
+      queryInfo: {
+        query:'',
+        //当前的页数
+            pageNo: 1,
+            //每页显示多少数据
+            pageSize: 10
+      },
+       //管理员列表
+      userlist:[ ],
+      //列表条数总数
+      total: 0,
+    
       // 编辑角色信息展示
       EditDialogVisible: false,
       dialogTableVisible: false,
       dialogFormVisible: false,
+      // 表单验证宽度
+      formLabelWidth: "100",
       // 添加管理员表单验证
       ruleForm: {
         account: "",
@@ -212,8 +241,14 @@ export default {
         charactorRight: ""
       },
       // 查询管理员信息
-      editForm: {},
-      //
+      editForm: {
+        uid: '',
+        uasername: "",
+        title: '',
+        tel: "",
+
+      },
+      //管理员信息规则
       editFormRules: {
         username: [
           {
@@ -255,7 +290,8 @@ export default {
         psd: [{ validator: checkPsd, trigger: "blur" }],
         repsd: [{ validator: checkRepsd, trigger: "blur" }],
         charactorRight: [{ validator: checkCharactorRight, trigger: "blur" }]
-      }
+      },
+    
     };
   },
 
@@ -267,37 +303,24 @@ export default {
   methods: {
     async getUserList() {
       // 获取用户列表请求
+      
       const { data: res } = await this.$axios
-        .get("/admin/getUserList", {
-          params: {
-            pageNo: 1,
-            pageSize: 5
-          }
-        })
-        .then(res => {
-          if (res.status == "200") {
-            this.$message.success("管理员信息获取成功");
-            console.log(res);
-            console.log(res.data);
-            (this.tableData = res.data.data.list),
-              (this.pageCount = res.data.data.pageCount),
-              (this.pageRows = res.data.data.pageRows);
-          }
-        })
-        .catch(error => {
-          console.log(error);
-          this.$alert("网络请求问题，联系管理员修复", "管理员的提示", {
-            confirmButtonText: "确定"
-          });
-        });
+        .get("/admin/getUserList", { params:this.queryInfo })
+         if (res.status !== "success") {
+//             this.$message.success("管理员信息获取成功");//测试管理员页面自动获取时可使用            
+               this.$alert("网络请求问题，联系管理员修复", "管理员的提示", {
+               confirmButtonText: "确定"
+              });
+
+          }
+else{
+
+        this.$message.success("管理员信息获取成功");
+        this.userlist = res.data.list
+        this.total = res.data.pageRows
+}
     },
-    // //关闭管理员编辑对话框监听事件
-    // EditDialogClosed: function(form){
-    //     this.dialogFormVisible = false;
-    //     this.$refs[form].resetFields();
-     
-    
-    // },
+
     closeDilog: function(form) {
       this.dialogFormVisible = false;
       this.$refs[form].resetFields(); //将form表单重置
@@ -333,17 +356,22 @@ export default {
       );
     },
     // 启用窗口
-    handleStart(index, row) {
+    async handleStart(index, row) {
       this.$confirm("确定要启用吗?", "信息", {
         confirmButtonText: "确定",
         cancelButtonText: "取消",
         type: "info"
       })
-        .then(() => {
+        .then(async () => {
+          const { data: res } = await this.$axios.get(
+            "/admin/banAdmin?uid=" + row.uid + "&status=1"
+          );
+
           this.$message({
             type: "success",
             message: "启用成功!"
           });
+          this.getUserList(); //刷新一次用户列表界面
         })
         .catch(() => {
           this.$message({
@@ -351,21 +379,24 @@ export default {
             message: "取消启用"
           });
         });
-
-      console.log(index, row);
     },
     // 停用窗口
-    handleStop(index, row) {
+    async handleStop(index, row) {
       this.$confirm("确定要停用吗?", "信息", {
         confirmButtonText: "确定",
         cancelButtonText: "取消",
         type: "info"
       })
-        .then(() => {
+        .then(async () => {
+          const { data: res } = await this.$axios.get(
+            "/admin/banAdmin?uid=" + row.uid + "&status=0"
+          );
+
           this.$message({
             type: "success",
             message: "停用成功!"
           });
+          this.getUserList(); //刷新一次用户列表界面
         })
         .catch(() => {
           this.$message({
@@ -381,7 +412,7 @@ export default {
       // console.log(row.uid);//点击的id
       // this.EditDialogVisible = true;
       const { data: res } = await this.$axios
-        .get("/admin/getUserInfo?uid=" + row.uid)
+        .get("/admin/getUserInfo")
         .then(res => {
           if (res.status == "200") {
             console.log(res.data);
@@ -399,20 +430,25 @@ export default {
           });
         });
     },
-    handleDelete(index, row) {
+    // 删除窗口
+    async handleDelete(index, row) {
       // 设置类似于console类型的功能
       this.$confirm("删除该条信息, 是否继续?", "提示", {
         confirmButtonText: "确定",
         cancelButtonText: "取消",
         type: "warning"
       })
-        .then(() => {
+        .then(async () => {
+          const { data: res } = await this.$axios.get(
+            "/admin/adminDelete?uId=" + row.uid
+          );
           // 移除对应索引位置的数据，可以对row进行设置向后台请求删除数据
-          this.tableData.splice(index, 1);
+          this.userlist.splice(index, 1);
           this.$message({
             type: "success",
             message: "删除成功!"
           });
+          this.getUserList(); //刷新一次用户列表界面
         })
         .catch(() => {
           this.$message({
@@ -428,6 +464,19 @@ export default {
     },
     handleSelectionChange(val) {
       this.multipleSelection = val;
+    },
+    //监听pagesize改变的事件
+    handleSizeChange(newSize) {
+      console.log(newSize);
+       this.queryInfo.pageSize =newSize
+       this.getUserList()
+    },
+    //监听 页码值 改变的事件
+    handleCurrentChange(newPage) {
+      console.log(newPage);
+       this.queryInfo.pageNo =newPage
+       this.getUserList()
+     
     }
   }
 };
