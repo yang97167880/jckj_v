@@ -75,9 +75,8 @@
           </el-table-column>
         </el-table-column>
       </el-table>
-   <!-- 分页区页面 -->   
+      <!-- 分页区页面 -->
       <div class="block">
-        
         <el-pagination
           @size-change="handleSizeChange"
           @current-change="handleCurrentChange"
@@ -90,7 +89,7 @@
       </div>
     </el-card>
 
-    <!--编辑管理员 对话框 Form
+    <!--添加管理员对话框 Form
     用户名form.name
     密码form.psd
     重复密码form.re_psd
@@ -154,8 +153,8 @@
         </el-form-item>
       </el-form>
       <span slot="footer" class="dialog-footer">
-        <el-button @click="EditDialogVisible = false">取 消</el-button>
-        <el-button type="primary" @click="EditDialogVisible = false">确 定</el-button>
+        <el-button @click="EditDialogVisible= false">取 消</el-button>
+        <el-button type="primary" @click="EditAdminInfo( editForm)">确 定</el-button>
       </span>
     </el-dialog>
   </div>
@@ -165,7 +164,6 @@ export default {
   // uid: '',
   inject: ["reload"],
   data() {
-   
     var checkTel = (rule, value, callback) => {
       if (!value) {
         return callback(new Error("联系电话不能为空"));
@@ -216,17 +214,17 @@ export default {
       // uid: " ",
       //管理员列表信息参数
       queryInfo: {
-        query:'',
+        query: "",
         //当前的页数
-            pageNo: 1,
-            //每页显示多少数据
-            pageSize: 10
+        pageNo: 1,
+        //每页显示多少数据
+        pageSize: 10
       },
-       //管理员列表
-      userlist:[ ],
+      //管理员列表
+      userlist: [],
       //列表条数总数
       total: 0,
-    
+
       // 编辑角色信息展示
       EditDialogVisible: false,
       dialogTableVisible: false,
@@ -242,11 +240,15 @@ export default {
       },
       // 查询管理员信息
       editForm: {
-        uid: '',
-        uasername: "",
-        title: '',
+        uid: "",
+        username: "",
+        title: "",
+        tel: ""
+      },
+      editForm_Post: {
         tel: "",
-
+        uid: "",
+        username: ""
       },
       //管理员信息规则
       editFormRules: {
@@ -290,8 +292,7 @@ export default {
         psd: [{ validator: checkPsd, trigger: "blur" }],
         repsd: [{ validator: checkRepsd, trigger: "blur" }],
         charactorRight: [{ validator: checkCharactorRight, trigger: "blur" }]
-      },
-    
+      }
     };
   },
 
@@ -301,30 +302,29 @@ export default {
   },
 
   methods: {
+    // 获取用户列表请求
     async getUserList() {
-      // 获取用户列表请求
-      
-      const { data: res } = await this.$axios
-        .get("/admin/getUserList", { params:this.queryInfo })
-         if (res.status !== "success") {
-//             this.$message.success("管理员信息获取成功");//测试管理员页面自动获取时可使用            
-               this.$alert("网络请求问题，联系管理员修复", "管理员的提示", {
-               confirmButtonText: "确定"
-              });
-
-          }
-else{
-
+      const { data: res } = await this.$axios.get("/admin/getUserList", {
+        params: this.queryInfo
+      });
+      if (res.status !== "success") {
+        //this.$message.success("管理员信息获取成功");//测试管理员页面自动获取时可使用
+        this.$alert("网络请求问题，联系管理员修复", "管理员的提示", {
+          confirmButtonText: "确定"
+        });
+      } else {
         this.$message.success("管理员信息获取成功");
-        this.userlist = res.data.list
-        this.total = res.data.pageRows
-}
+        this.userlist = res.data.list;
+        // console.log(res.data)//查看用户数据
+        this.total = res.data.pageRows;
+      }
     },
-
+    //添加管理员，修改管理员的关闭窗口
     closeDilog: function(form) {
       this.dialogFormVisible = false;
       this.$refs[form].resetFields(); //将form表单重置
     },
+    //添加管理员确认窗口
     submitForm(formName) {
       this.$refs[formName].validate(valid => {
         if (valid) {
@@ -342,6 +342,7 @@ else{
 
       this.$refs[formName].resetFields();
     },
+    //抬头“添加管理员”
     renderHeader() {
       return (
         <div>
@@ -405,31 +406,56 @@ else{
           });
         });
 
-      console.log(index, row);
+    // console.log(index, row);//输出index第几行 和row信息
     },
     // 管理员信息编辑窗口
     async handleEdit(row) {
-      // console.log(row.uid);//点击的id
-      // this.EditDialogVisible = true;
-      const { data: res } = await this.$axios
-        .get("/admin/getUserInfo")
-        .then(res => {
-          if (res.status == "200") {
-            console.log(res.data);
-            console.log(res.data.data);
-            this.editForm = res.data.data;
-            this.EditDialogVisible = true;
-          } else {
-            this.$message.error("管理员信息获取失败！！！");
-          }
-        })
-        .catch(error => {
-          console.log(error);
-          this.$alert("网络请求问题，联系管理员修复", "管理员的提示", {
-            confirmButtonText: "确定"
-          });
-        });
+      //console.log(row); //测试row(包含uid，title,createdAt,tel)
+      this.editForm = row;
+      this.EditDialogVisible = true;
     },
+
+    //修改管理员信息并提交
+    EditAdminInfo() {
+      this.$refs.editFormRef.validate(valid => {
+        //判断与校验是否通过
+        // console.log(valid)//判断与校验是否通过
+        if (!valid) return; //发起修改用户信息的数据请求
+      
+        let params = new URLSearchParams();
+        params.append("tel", this.editForm.tel);
+        params.append("uid", this.editForm.uid);
+        params.append("username", this.editForm.username);
+        // for (var value of params.keys()) {
+        //   console.log(value); //遍历所有key  俩者是对应的
+        // }
+        // for (var value of params.values()) {
+        //   console.log(value); //遍历所有的值
+        // }
+
+        this.$axios({
+          method: "post",
+          url: "/admin/updateAdmin",
+          data: params
+       
+        })
+          .then(response => {
+            // console.log(response);
+            // console.log(response.data);//测试用接口
+          this.postData = response.data;
+          this.EditDialogVisible = false; 
+          //提示修改成功
+            this.$message.success("更新用户成功！");
+            //刷新数据
+            this.getUserList(); 
+          })
+          .catch(error => {
+            // console.log(error);
+            this.$message.error("更新用户信息失败！");
+          });
+      });
+    },
+
     // 删除窗口
     async handleDelete(index, row) {
       // 设置类似于console类型的功能
@@ -457,10 +483,12 @@ else{
           });
         });
 
-      console.log(index, row);
+      // console.log(index, row);//测试使用
     },
+    //判断按钮状态绑定
     judegment(index, row) {
-      console.log(index, row);
+     
+      // console.log(index, row);//测试使用
     },
     handleSelectionChange(val) {
       this.multipleSelection = val;
@@ -468,15 +496,14 @@ else{
     //监听pagesize改变的事件
     handleSizeChange(newSize) {
       console.log(newSize);
-       this.queryInfo.pageSize =newSize
-       this.getUserList()
+      this.queryInfo.pageSize = newSize;
+      this.getUserList();
     },
     //监听 页码值 改变的事件
     handleCurrentChange(newPage) {
       console.log(newPage);
-       this.queryInfo.pageNo =newPage
-       this.getUserList()
-     
+      this.queryInfo.pageNo = newPage;
+      this.getUserList();
     }
   }
 };
