@@ -139,11 +139,13 @@
 
       <!-- 用户注册对话框 -->
       <el-dialog
-        modal-append-to-body="true"
+      
+        :modal-append-to-body="true"
         custom-class="bg-col"
         title="用户注册"
-        :visible.sync="dialogVisible"
+       :visible.sync="dialogFormVisible"
         width="50%"
+       
       >
         <Dialog></Dialog>
       </el-dialog>
@@ -196,11 +198,23 @@
 import Dialog from './Dialog'
 export default {
   components: { Dialog, props: ['visible'] },
-  data () {
+  data () { 
+  
+
     return {
-      // msg:"nihao",
+      //显示框
+        showForm: '',
+        showFormRules: '',
+        //用户个人信息
+        uid: '',
+        username: '',
+        title: '',
+        tel: '',
+        createdAt: '',
+    //用户注册对话框
+      dialogFormVisible: false,
       // 用户个人信息展示
-      personalDialogVisible:false,
+      personalDialogVisible: false,
       activeIndex: '2-1',
       activeIndex2: this.$route.path,
       isCollapse: false,
@@ -221,7 +235,7 @@ export default {
         '/SysLog': '系统日志'      },
       tabName: this.$route.path,
       tabIndex: 2,
-      dialogVisible: false
+      
     };
   },
     // 周期函数
@@ -234,12 +248,11 @@ export default {
     
    
         const { data: res } = await this.$axios
-        .get("/admin/getUserInfo?uid=1") .then(res => {
-          
+        .get("/admin/getUserInfo") 
+        .then( async ()  => {         
+           console.log(res.data);
           if (res.data.status == "success") {
             this.$message.success("获取个人信息成功");
-            console.log(res.data.data);
-
             this.uid=res.data.data.uid
             this.username=res.data.data.username
             this.title=res.data.data.title
@@ -288,7 +301,9 @@ export default {
     },
     handleSelect (key, keyPath) {
       if (key == '2-1') {
-        this.dialogVisible = true;
+       
+        this.dialogFormVisible = true;
+        
       }
 
       console.log(key, keyPath);
@@ -325,7 +340,12 @@ export default {
       this.editableTabs = tabs.filter(tab => tab.name !== targetName);
     },
 
-  }
+  },
+  //  //注册用户的关闭窗口
+  //   close(){
+  //     this.dialogFormVisible = false;
+  //     this.$refs[form].resetFields(); //将form表单重置
+  //   },
 }
 </script>
 <style>

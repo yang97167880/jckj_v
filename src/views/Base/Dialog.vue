@@ -103,47 +103,50 @@ export default {
   },
   methods: {
     submitForm (formName) {
-   
-      this.$refs[formName].validate(async valid => {
-        if (valid){
-           let obj = {
-      username: this.ruleForm.username,
-      password:  this.ruleForm.password,
-      tel: this.ruleForm.tel,
+       this.$refs[formName].validate(valid => {
+        //判断与校验是否通过
+        // console.log(valid)//判断与校验是否通过
+        if (!valid) return; //发起修改用户信息的数据请求
       
-    };
-           console.log(obj);
-         const{data:res}= await  this.$axios
-         .post('/admin/userAdd',qs.stringify(obj),{headers:{'Content-Type':'application/x-www-form-urlencoded'}}
-         ) 
-         .then(res => {  
-             console.log(res);
-            console.log(res.data);      
-          if(res.data.status == "success"){
-             alert('注册成功!');         
-         
-           //关闭窗口
-          //  this.dialogFormVisible = false;
-          //重置用户列表数据
-              this.$refs[formName].resetFields();
-          
-          }
-         else {
-          console.log('注册失败!!');
-          return false;
-        }
-        }).catch(error => {
-          console.log(error);
-          this.$alert("网络请求问题，联系管理员修复", "管理员的提示", {
-            confirmButtonText: "确定"
+        let params = new URLSearchParams();
+        params.append("tel", this.ruleForm.tel);
+        params.append("password", this.ruleForm.password);
+        params.append("username", this.ruleForm.username);
+       
+        this.$axios({
+          method: "post",
+          url: "/admin/userAdd",
+          data: params
+       
+        }) .then(response => {
+            // console.log(response);
+            // console.log(response.data);//测试接口数据
+          //提示注册成功
+           this.$notify({
+          title: '成功',
+          message: '用户注册成功',
+          type: 'success'
+        });    
+// console.log(this.$refs[formName])
+//重置窗口
+   this.$refs[formName].resetFields();
+
+})
+          .catch(error => {
+           this.$notify.error({
+          title: '错误',
+          message: '用户注册失败——该用户名已被注册'
+        });
+
           });
-        });
-        }
-      })
+       })
     },
+     //注册用户的重置函数
     resetForm (formName) {
       this.$refs[formName].resetFields();
+
     },
+   
   }
 }
 </script>
