@@ -56,22 +56,24 @@ module.exports = (options = {}) => ({
     extensions: ['.js', '.vue', '.json', '.css']
   },
   devServer: {
- 
+
     host: 'localhost',
     port: 8888,
     proxy: {
-      '/api/': {
+      '/api': {
         target: 'http://localhost:8088',
+        secure: false,
         changeOrigin: true,
         pathRewrite: {
           '^/api': ''
         }
       },
-    
+
     },
     historyApiFallback: {
       index: url.parse(options.dev ? '/assets/' : publicPath).pathname
     }
   },
+
   devtool: options.dev ? '#eval-source-map' : '#source-map'
 })

@@ -74,16 +74,16 @@ const router = new VueRouter({
   routes
 })
 //挂载路由导航守卫
-router.beforeEach((to, from, next) => {
-  //to will visit
-  //from where are you come from
-  //next fuction means OK
-  //next()放行 next('login')强行跳转
-  if (to.path === '/login') return next();
-  //获得token
-  const tokenStr = window.sessionStorage.getItem('token')
-  if (!tokenStr) return next('/login')
-  next()
-})
+// router.beforeEach((to, from, next) => {
+//   //to will visit
+//   //from where are you come from
+//   //next fuction means OK
+//   //next()放行 next('login')强行跳转
+//   if (to.path === '/login') return next();
+//   //获得token
+//   const tokenStr = window.sessionStorage.getItem('token')
+//   if (!tokenStr) return next('/login')
+//   next()
+// })
 
 export default router

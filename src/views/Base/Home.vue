@@ -7,7 +7,7 @@
         class="el-menu-demo"
         mode="horizontal"
         @select="handleSelect"
-        background-color="#545c64"
+        background-color="rgb(41, 60, 85)"
         text-color="#fff"
         active-text-color="#ffd04b"
       >
@@ -22,19 +22,19 @@
           >
         </el-submenu>
 
-        <el-submenu index="3" style="float:right">
+        <el-submenu index="3" style="float: right">
           <template slot="title"><i class="el-icon-plus"></i>admin</template>
-          <el-menu-item index="3-1" @click =" personalInformation "
-            ><i class="el-icon-s-check" ></i>个人信息</el-menu-item
+          <el-menu-item index="3-1" @click="personalInformation"
+            ><i class="el-icon-s-check"></i>个人信息</el-menu-item
           >
           <el-menu-item index="3-2"
             ><i class="el-icon-connection"></i>切换用户</el-menu-item
           >
           <el-menu-item index="3-3" @click="logout"
-            ><i class="el-icon-switch-button" ></i>退出</el-menu-item
+            ><i class="el-icon-switch-button"></i>退出</el-menu-item
           >
         </el-submenu>
-        <span style="float:right;color:white">超级管理员</span>
+        <span style="float: right; color: white">超级管理员</span>
       </el-menu>
     </el-header>
     <!-- end -->
@@ -51,7 +51,7 @@
         @close="handleClose"
         :collapse="isCollapse"
         background-color="#e9eef3"
-        style="height:100%"
+        style="height: 100%"
       >
         <el-submenu index="1">
           <template slot="title">
@@ -106,7 +106,7 @@
 
       <!-- 中部视图区 -->
       <el-main>
-        <el-header>
+        <!-- <el-header>
           <el-tabs
             v-model="editableTabsValue"
             type="border-card"
@@ -124,8 +124,8 @@
             >
             </el-tab-pane>
           </el-tabs>
-        </el-header>
-        <el-main style="padding-top:6px">
+        </el-header> -->
+        <el-main>
           <transition name="move" mode="out-in">
             <template>
               <keep-alive>
@@ -139,13 +139,11 @@
 
       <!-- 用户注册对话框 -->
       <el-dialog
-      
         :modal-append-to-body="true"
         custom-class="bg-col"
         title="用户注册"
-       :visible.sync="dialogFormVisible"
+        :visible.sync="dialogFormVisible"
         width="50%"
-       
       >
         <Dialog></Dialog>
       </el-dialog>
@@ -155,42 +153,41 @@
         :visible.sync="personalDialogVisible"
         width="50%"
       >
-       <el-form
-        :model="showForm"
-        :rules="showFormRules"
-        ref="showFormRef"
-        label-width="100px"
-        class="demo-ruleForm"
-      >
-      
-        <el-form-item label="用户ID">
-         {{ uid }}
-        </el-form-item>
-        <el-form-item label="用户名:">
-         {{username }}
-        </el-form-item>
-         <el-form-item label="权限:">
-         {{  title }}
-        </el-form-item>
-         <el-form-item label="创建时间:">
-         {{ createdAt }}
-        </el-form-item>
-         <el-form-item label="手机:">
-         {{  tel }}
-        </el-form-item>
-         
-       </el-form>
-      <!-- <span>用户ID:{{ uid }}</span>
+        <el-form
+          :model="showForm"
+          :rules="showFormRules"
+          ref="showFormRef"
+          label-width="100px"
+          class="demo-ruleForm"
+        >
+          <el-form-item label="用户ID">
+            {{ uid }}
+          </el-form-item>
+          <el-form-item label="用户名:">
+            {{ username }}
+          </el-form-item>
+          <el-form-item label="权限:">
+            {{ title }}
+          </el-form-item>
+          <el-form-item label="创建时间:">
+            {{ createdAt }}
+          </el-form-item>
+          <el-form-item label="手机:">
+            {{ tel }}
+          </el-form-item>
+        </el-form>
+        <!-- <span>用户ID:{{ uid }}</span>
       <p><span>用户名:{{ username }}</span></p>
       <p><span>权限:{{ title }}</span></p>
       <p><span>创建时间:{{ createdAt }}</span></p>
       <p><span>手机:{{ tel }}</span></p> -->
         <span slot="footer" class="dialog-footer">
-        <el-button @click="personalDialogVisible = false">取 消</el-button>
-        <el-button type="primary" @click="personalDialogVisible = false">确 定</el-button>
-      </span>
+          <el-button @click="personalDialogVisible = false">取 消</el-button>
+          <el-button type="primary" @click="personalDialogVisible = false"
+            >确 定</el-button
+          >
+        </span>
       </el-dialog>
-
     </el-container>
   </el-container>
 </template>
@@ -198,20 +195,20 @@
 import Dialog from './Dialog'
 export default {
   components: { Dialog, props: ['visible'] },
-  data () { 
-  
+  data () {
+
 
     return {
       //显示框
-        showForm: '',
-        showFormRules: '',
-        //用户个人信息
-        uid: '',
-        username: '',
-        title: '',
-        tel: '',
-        createdAt: '',
-    //用户注册对话框
+      showForm: '',
+      showFormRules: '',
+      //用户个人信息
+      uid: '',
+      username: '',
+      title: '',
+      tel: '',
+      createdAt: '',
+      //用户注册对话框
       dialogFormVisible: false,
       // 用户个人信息展示
       personalDialogVisible: false,
@@ -232,34 +229,35 @@ export default {
         '/HistoryData': '历史数据',
         '/UserAdmin': '角色管理',
         '/AdminList': '管理员列表',
-        '/SysLog': '系统日志'      },
+        '/SysLog': '系统日志'
+      },
       tabName: this.$route.path,
       tabIndex: 2,
-      
+
     };
   },
-    // 周期函数
-  created() {
-  
+  // 周期函数
+  created () {
+
   },
   methods: {
-  //  展示个人用户信息
-  async  personalInformation(){
-    
-   
-        const { data: res } = await this.$axios
-        .get("/admin/getUserInfo") 
-        .then( async ()  => {         
-           console.log(res.data);
+    //  展示个人用户信息
+    async personalInformation () {
+
+
+      const { data: res } = await this.$axios
+        .get("/admin/getUserInfo")
+        .then(async () => {
+          console.log(res.data);
           if (res.data.status == "success") {
             this.$message.success("获取个人信息成功");
-            this.uid=res.data.data.uid
-            this.username=res.data.data.username
-            this.title=res.data.data.title
-            this.createdAt=res.data.data.createdAt
-            this.tel=res.data.data.tel
+            this.uid = res.data.data.uid
+            this.username = res.data.data.username
+            this.title = res.data.data.title
+            this.createdAt = res.data.data.createdAt
+            this.tel = res.data.data.tel
             this.personalDialogVisible = true;
-         
+
           }
         })
         .catch(error => {
@@ -269,8 +267,8 @@ export default {
           });
         });
     },
-  
-    logout(){
+
+    logout () {
       window.sessionStorage.clear()
       this.$router.push("/login");
     },
@@ -301,9 +299,9 @@ export default {
     },
     handleSelect (key, keyPath) {
       if (key == '2-1') {
-       
+
         this.dialogFormVisible = true;
-        
+
       }
 
       console.log(key, keyPath);
